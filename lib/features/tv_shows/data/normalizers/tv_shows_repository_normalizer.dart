@@ -1,0 +1,3 @@
+class TvShowsRepositoryNormalizer {
+  TvShowsRepositoryNormalizer._();
+}
