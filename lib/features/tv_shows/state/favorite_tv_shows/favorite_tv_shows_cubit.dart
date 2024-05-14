@@ -10,7 +10,7 @@ class FavoriteTvShowsCubit extends Cubit<FavoriteTvShowsState> {
 
   final LocalTvShowsRepository localTvShowsRepository;
 
-  Future<void> getTvShows() async {
+  Future<void> getFavoriteTvShows() async {
     try {
       emit(FavoriteTvShowsLoadingState());
 

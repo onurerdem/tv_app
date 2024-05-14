@@ -10,22 +10,38 @@ class TvShowsCubit extends Cubit<TvShowsState> {
 
   final CloudTvShowsRepository cloudTvShowsRepository;
 
-  Future<void> getTvShows() async {
+  Future<void> getTvShows({
+    required String? search,
+  }) async {
+    List<ITvShow> tvShows = [];
     try {
       emit(TvShowsLoadingState());
 
-      final List<ITvShow> tvShows = await cloudTvShowsRepository.getTvShows(
-        page: 1,
-      );
+      if (search != null) {
+        tvShows.addAll(
+          await cloudTvShowsRepository.getTvShowsWithSearch(
+            search: search,
+          ),
+        );
+      } else {
+        tvShows.addAll(
+          await cloudTvShowsRepository.getTvShows(
+            page: 1,
+          ),
+        );
+      }
 
       emit(
         TvShowsLoadedState(
           tvShows: tvShows,
           currentPage: 1,
-          hasNextPage: tvShows.isNotEmpty,
+          hasNextPage: search != null ? false : tvShows.isNotEmpty,
         ),
       );
-    } catch (_) {
+    } catch (_, __) {
+      print(_);
+
+      print(__);
       emit(TvShowsErrorState());
     }
   }

@@ -15,5 +15,5 @@ class ITvShow {
   final String summary;
   final List<String> genres;
   final DateTime premieredAt;
-  final DateTime endedAt;
+  final DateTime? endedAt;
 }
