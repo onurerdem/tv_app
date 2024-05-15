@@ -10,8 +10,8 @@ class IEpisode {
 
   final String id;
   final String name;
-  final String description;
-  final String? featuredImageUrl;
+  final String? description;
+  final String featuredImageUrl;
   final int season;
   final int number;
 }

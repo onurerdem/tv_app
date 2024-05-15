@@ -59,13 +59,14 @@ class TvShowCard extends StatelessWidget {
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.white,
                               ),
-                              UIText(
-                                tvShow.summary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.text,
-                                maxLines: 4,
-                              ),
+                              if (tvShow.description != null)
+                                UIText(
+                                  tvShow.description!,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.text,
+                                  maxLines: 4,
+                                ),
                               const SizedBox(height: 16),
                             ],
                           ),

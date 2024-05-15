@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:tv_app/features/tv_shows/data/normalizers/tv_shows_repository_normalizer.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/cloud_tv_shows_repository_interface.dart';
+import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
 
 class CloudTvShowsRepository extends ICloudTvShowsRepository {
@@ -55,13 +56,35 @@ class CloudTvShowsRepository extends ICloudTvShowsRepository {
   Future<ITvShow> getTvShow({
     required String tvShowId,
   }) async {
-    throw UnimplementedError();
+    final Response<dynamic> res = await httpClient.get(
+      '/shows/$tvShowId',
+    );
+
+    final ITvShow tvShow = TvShowsRepositoryNormalizer.tvShowFromMap(
+      mapData: res.data,
+    );
+
+    return tvShow;
   }
 
   @override
-  Future<List<ITvShow>> getTvShowEpisodes({
+  Future<List<IEpisode>> getTvShowEpisodes({
     required String tvShowId,
   }) async {
-    throw UnimplementedError();
+    final List<IEpisode> episodes = [];
+
+    final Response<dynamic> res = await httpClient.get(
+      '/shows/$tvShowId/episodes',
+    );
+
+    for (final Map<String, dynamic> mapData in res.data) {
+      episodes.add(
+        TvShowsRepositoryNormalizer.episodeFromMap(
+          mapData: mapData,
+        ),
+      );
+    }
+
+    return episodes;
   }
 }

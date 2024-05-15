@@ -1,5 +1,7 @@
 import 'package:tv_app/core/helpers/html_helper.dart';
+import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
+import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_schedule_intertface.dart';
 
 class TvShowsRepositoryNormalizer {
   TvShowsRepositoryNormalizer._();
@@ -13,15 +15,45 @@ class TvShowsRepositoryNormalizer {
         featuredImageUrl: mapData['image']?['medium'] as String? ??
             mapData['image']?['original'] as String? ??
             'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
-        summary: HtmlHelper.removeAllHtmlTags(mapData['summary'] as String),
-        genres: List<String>.from(mapData['genres']),
-        premieredAt: DateTime.parse(
-          mapData['premiered'],
-        ),
+        description: mapData['summary'] == null
+            ? null
+            : HtmlHelper.removeAllHtmlTags(mapData['summary'] as String),
+        genres: mapData['genres'] != null
+            ? List<String>.from(mapData['genres'])
+            : [],
+        premieredAt: mapData['premiered'] == null
+            ? null
+            : DateTime.parse(
+                mapData['premiered'],
+              ),
         endedAt: mapData['ended'] == null
             ? null
             : DateTime.parse(
                 mapData['ended'],
               ),
+              tvShowSchedule: ITvShowSchedule(
+          time: mapData['schedule']?['time'] as String?,
+          days: mapData['schedule']?['days'] != null
+              ? List<String>.from(mapData['schedule']?['days'])
+              : null,
+        ),
+        network: mapData['network']?['name'] as String?,
+        episodes: [],
+      );
+
+  static IEpisode episodeFromMap({
+    required Map<String, dynamic> mapData,
+  }) =>
+      IEpisode(
+        id: (mapData['id'] as int).toString(),
+        name: mapData['name'] as String,
+        description: mapData['summary'] == null
+            ? null
+            : HtmlHelper.removeAllHtmlTags(mapData['summary'] as String),
+        featuredImageUrl: mapData['image']?['medium'] as String? ??
+            mapData['image']?['original'] as String? ??
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
+        season: mapData['season'] as int,
+        number: mapData['number'] as int,
       );
 }

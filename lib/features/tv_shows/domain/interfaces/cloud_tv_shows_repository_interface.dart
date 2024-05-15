@@ -1,3 +1,4 @@
+import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
 
 abstract class ICloudTvShowsRepository {
@@ -10,7 +11,7 @@ abstract class ICloudTvShowsRepository {
   Future<ITvShow> getTvShow({
     required String tvShowId,
   });
-  Future<List<ITvShow>> getTvShowEpisodes({
+  Future<List<IEpisode>> getTvShowEpisodes({
     required String tvShowId,
   });
 }

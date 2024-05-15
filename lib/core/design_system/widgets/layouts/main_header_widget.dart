@@ -82,7 +82,7 @@ class UIMainHeader extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 const UIText(
-                                  'Profile',
+                                  'Tv',
                                   maxLines: 1,
                                   color: AppColors.white,
                                   fontSize: 20,

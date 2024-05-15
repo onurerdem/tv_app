@@ -11,7 +11,7 @@ class UIAppInfo extends StatelessWidget {
     return Column(
       children: [
         Text(
-          '© ${DateTime.now().year.toString()} Nui',
+          '© ${DateTime.now().year.toString()} Tv',
           style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w400,

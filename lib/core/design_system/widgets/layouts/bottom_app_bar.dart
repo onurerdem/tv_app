@@ -166,8 +166,7 @@ class UIBottomAppBar extends StatelessWidget {
     //     return getIt<AppNavigationService>().routeToHome();
     //   case TabType.chat:
     //     return getIt<AppNavigationService>().routeToChat();
-    //   case TabType.nuiEdu:
-    //     return getIt<AppNavigationService>().routeToMainNuiClasses();
+    //   
     //   case TabType.routines:
     //     return getIt<AppNavigationService>().routeToRoutines();
     //   case TabType.profile:
