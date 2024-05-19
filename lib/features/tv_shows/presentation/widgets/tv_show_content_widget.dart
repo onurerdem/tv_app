@@ -71,7 +71,7 @@ class TvShowContent extends StatelessWidget {
               ],
             ),
             UIText(
-              '${tvShow.premieredAt?.year}${tvShow.premieredAt != null && tvShow.endedAt != null ? ' | ' : ''}${tvShow.endedAt?.year}',
+              '${tvShow.premieredAt?.year ?? ''}${tvShow.premieredAt != null && tvShow.endedAt != null ? ' | ' : ''}${tvShow.endedAt?.year ?? ''}',
               fontSize: 18,
               fontWeight: FontWeight.w500,
               color: AppColors.white,
@@ -146,7 +146,8 @@ class TvShowContent extends StatelessWidget {
                     text: tvShow.network!,
                     verticalPadding: 4,
                     horizontalPadding: 10,
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: AppColors.green,
+                    textColor: AppColors.background,
                   ),
                 if (tvShow.tvShowSchedule?.days?.isNotEmpty ?? false)
                   UILabelCard(
@@ -154,7 +155,8 @@ class TvShowContent extends StatelessWidget {
                     verticalPadding: 4,
                     horizontalPadding: 10,
                     svgIconPath: AssetSvgsHelper.calendar,
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: AppColors.green,
+                    textColor: AppColors.background,
                   ),
                 if (tvShow.tvShowSchedule?.time != null)
                   UILabelCard(
@@ -162,7 +164,8 @@ class TvShowContent extends StatelessWidget {
                     verticalPadding: 4,
                     horizontalPadding: 10,
                     svgIconPath: AssetSvgsHelper.clock,
-                    backgroundColor: Colors.lightBlue,
+                    backgroundColor: AppColors.green,
+                    textColor: AppColors.background,
                   ),
               ],
             ),

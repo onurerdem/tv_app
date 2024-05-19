@@ -6,6 +6,7 @@ class IEpisode {
     required this.featuredImageUrl,
     required this.season,
     required this.number,
+    required this.airdate,
   });
 
   final String id;
@@ -14,4 +15,5 @@ class IEpisode {
   final String featuredImageUrl;
   final int season;
   final int number;
+  final DateTime? airdate;
 }

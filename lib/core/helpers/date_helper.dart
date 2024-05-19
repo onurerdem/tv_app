@@ -7,30 +7,24 @@ class DateHelper {
     required DateTime date,
   }) {
     final int differenceInMinutes = DateTime.now().difference(date).inMinutes;
-    final int differenceInHours = DateTime.now().difference(date).inHours;
     if (differenceInMinutes < 2) {
       return 'Now';
     }
-    if (differenceInMinutes < 60) {
-      return '${differenceInMinutes}m ago';
-    }
-    if (differenceInHours < 12) {
-      return '${differenceInHours}h ago';
-    }
+
     if (isToday(date: date)) {
-      return 'Today at ${getTime(date: date)}';
+      return 'Today';
     }
     if (isYesterday(date: date)) {
-      return 'Yesterday at ${getTime(date: date)}';
+      return 'Yesterday';
     }
     if (date.isAfter(
       DateTime.now().subtract(const Duration(days: 6)),
     )) {
-      return DateFormat('EEEE hh:mm a').format(
+      return DateFormat('EEEE').format(
         date,
       );
     } else {
-      return DateFormat('dd MMM yyyy hh:mm a').format(
+      return DateFormat('dd MMM yyyy').format(
         date,
       );
     }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/dialogs/confirmation_dialog_widget.dart';
+import 'package:tv_app/core/design_system/widgets/dialogs/core_bottom_sheet_widget.dart';
 import 'package:tv_app/core/design_system/widgets/dialogs/core_dialog_widget.dart';
 
 class AppDialogsService {
@@ -98,4 +99,22 @@ class AppDialogsService {
       },
     );
   }
+
+   Future<void> showCoreBottomSheet({
+    required Widget content,
+  }) =>
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        backgroundColor: Colors.white,
+        builder: (BuildContext context) {
+          return UICoreButtonSheet(
+            child: content,
+          );
+        },
+      );
 }

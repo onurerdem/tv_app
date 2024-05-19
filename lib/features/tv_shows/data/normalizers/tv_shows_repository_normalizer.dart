@@ -55,5 +55,8 @@ class TvShowsRepositoryNormalizer {
             'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
         season: mapData['season'] as int,
         number: mapData['number'] as int,
+        airdate: mapData['airdate'] != null
+            ? DateTime.parse(mapData['airdate'] as String)
+            : null,
       );
 }

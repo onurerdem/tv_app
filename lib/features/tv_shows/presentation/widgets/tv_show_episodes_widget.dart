@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tv_app/core/dependencies/dependencies.dart';
 import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/buttons/core_button_widget.dart';
 import 'package:tv_app/core/design_system/widgets/cards/label_card_widget.dart';
@@ -6,7 +7,10 @@ import 'package:tv_app/core/design_system/widgets/images/network_image_widget.da
 import 'package:tv_app/core/design_system/widgets/layouts/divider_widget.dart';
 import 'package:tv_app/core/design_system/widgets/texts/header_text_widget.dart';
 import 'package:tv_app/core/design_system/widgets/texts/text_widget.dart';
+import 'package:tv_app/core/helpers/date_helper.dart';
+import 'package:tv_app/core/navigation/services/dialogs_service.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
+import 'package:tv_app/features/tv_shows/presentation/widgets/episode_bottom_sheet_content_widget.dart';
 
 class TvShowEpsisodes extends StatefulWidget {
   const TvShowEpsisodes({
@@ -51,6 +55,9 @@ class _TvShowEpsisodesState extends State<TvShowEpsisodes> {
                 backgroundColor: _selectedSeason == _seasons[index]
                     ? AppColors.primary
                     : AppColors.background,
+                textColor: _selectedSeason == _seasons[index]
+                    ? AppColors.background
+                    : AppColors.white,
                 borderColor: AppColors.primary,
                 onPressed: () =>
                     setState(() => _selectedSeason = _seasons[index]),
@@ -91,7 +98,12 @@ class _TvShowEpsisodesState extends State<TvShowEpsisodes> {
     required bool isLastIndex,
   }) {
     return UICoreButton(
-      onPressed: () {},
+      onPressed: () => getIt<AppDialogsService>().showCoreBottomSheet(
+        content: EpisodeBottomSheetContent(
+          episode: episode,
+          index: index,
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -103,16 +115,16 @@ class _TvShowEpsisodesState extends State<TvShowEpsisodes> {
             child: Row(
               children: [
                 Container(
-                  width: 80,
-                  height: 72,
+                  height: 90,
+                  width: 100,
                   decoration: BoxDecoration(
                     color: AppColors.dark1,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   clipBehavior: Clip.hardEdge,
                   child: UINetworkImage(
-                    height: 72,
-                    width: 80,
+                    height: 90,
+                    width: 100,
                     url: episode.featuredImageUrl,
                   ),
                 ),
@@ -134,14 +146,20 @@ class _TvShowEpsisodesState extends State<TvShowEpsisodes> {
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
+                      if (episode.airdate != null) ...[
+                        const SizedBox(height: 6),
+                        UIText(
+                          DateHelper.smartDate(date: episode.airdate!),
+                          color: AppColors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ],
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-          const SizedBox(
-            height: 16,
           ),
           const SizedBox(height: 16),
           if (!isLastIndex) const UIDivider(),
