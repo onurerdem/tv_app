@@ -31,7 +31,7 @@ class TvShowsRepositoryNormalizer {
             : DateTime.parse(
                 mapData['ended'],
               ),
-              tvShowSchedule: ITvShowSchedule(
+        tvShowSchedule: ITvShowSchedule(
           time: mapData['schedule']?['time'] as String?,
           days: mapData['schedule']?['days'] != null
               ? List<String>.from(mapData['schedule']?['days'])

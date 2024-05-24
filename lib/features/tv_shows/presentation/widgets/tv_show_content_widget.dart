@@ -151,14 +151,14 @@ class TvShowContent extends StatelessWidget {
                   ),
                 if (tvShow.tvShowSchedule?.days?.isNotEmpty ?? false)
                   UILabelCard(
-                    text: tvShow.tvShowSchedule!.days!.join(', '),
+                    text: tvShow.tvShowSchedule!.days!.take(3).join(', '),
                     verticalPadding: 4,
                     horizontalPadding: 10,
                     svgIconPath: AssetSvgsHelper.calendar,
                     backgroundColor: AppColors.green,
                     textColor: AppColors.background,
                   ),
-                if (tvShow.tvShowSchedule?.time != null)
+                if (tvShow.tvShowSchedule?.time?.trim().isNotEmpty ?? false)
                   UILabelCard(
                     text: tvShow.tvShowSchedule!.time!,
                     verticalPadding: 4,

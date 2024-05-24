@@ -5,11 +5,12 @@ import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dar
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
 
 class CloudTvShowsRepository extends ICloudTvShowsRepository {
-   CloudTvShowsRepository({
+  CloudTvShowsRepository({
     required this.httpClient,
   });
 
   final Dio httpClient;
+
   @override
   Future<List<ITvShow>> getTvShows({
     required int page,
@@ -17,7 +18,7 @@ class CloudTvShowsRepository extends ICloudTvShowsRepository {
     final List<ITvShow> tvShows = [];
 
     final Response<dynamic> res = await httpClient.get(
-      '/shows',
+      '/shows?page=$page',
     );
 
     for (final Map<String, dynamic> mapData in res.data) {

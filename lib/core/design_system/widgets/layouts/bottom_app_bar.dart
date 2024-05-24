@@ -1,10 +1,12 @@
 import 'package:glass_kit/glass_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:tv_app/core/dependencies/dependencies.dart';
 import 'package:tv_app/core/design_system/helpers/asset_svgs_helper.dart';
 import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/buttons/core_button_widget.dart';
 import 'package:tv_app/core/design_system/widgets/images/svg_asset_widget.dart';
+import 'package:tv_app/core/navigation/services/navigation_service.dart';
 
 enum TabType {
   tvShows,
@@ -134,9 +136,9 @@ class UIBottomAppBar extends StatelessWidget {
       case TabType.tvShows:
         return AppColors.primary;
       case TabType.actors:
-        return AppColors.purple;
-      case TabType.settings:
         return AppColors.green;
+      case TabType.settings:
+        return AppColors.purple;
     }
   }
 
@@ -161,17 +163,14 @@ class UIBottomAppBar extends StatelessWidget {
   void _navigate({
     required TabType tabType,
   }) {
-    // switch (tabType) {
-    //   case TabType.home:
-    //     return getIt<AppNavigationService>().routeToHome();
-    //   case TabType.chat:
-    //     return getIt<AppNavigationService>().routeToChat();
-    //   
-    //   case TabType.routines:
-    //     return getIt<AppNavigationService>().routeToRoutines();
-    //   case TabType.profile:
-    //     return getIt<AppNavigationService>().routeToProfile();
-    // }
+    switch (tabType) {
+      case TabType.tvShows:
+        return getIt<AppNavigationService>().routeToTvShows();
+      case TabType.actors:
+        return getIt<AppNavigationService>().routeToActors();
+      case TabType.settings:
+        return;
+    }
   }
 
   String _getIconPath({

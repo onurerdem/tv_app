@@ -39,9 +39,6 @@ class TvShowsCubit extends Cubit<TvShowsState> {
         ),
       );
     } catch (_, __) {
-      print(_);
-
-      print(__);
       emit(TvShowsErrorState());
     }
   }
