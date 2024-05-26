@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/fields/search_field_widget.dart';
 import 'package:tv_app/core/design_system/widgets/indicators/error_indicator_widget.dart';
 import 'package:tv_app/core/design_system/widgets/indicators/loading_indicator_widget.dart';
@@ -65,17 +66,19 @@ class _ActorsScreenState extends State<ActorsScreen> {
             return Padding(
               padding: const EdgeInsets.only(top: 200),
               child: UIErrorIndicator(
-                errorText:
-                    'Failed to load actors, please check your internet connection.',
-                onPressed: () => context.read<ActorsCubit>().getActors(
-                      search: _seachText.isEmpty ? null : _seachText,
-                    ),
-              ),
+                  errorText:
+                      'Failed to load actors, please check your internet connection.',
+                  onPressed: () => context.read<ActorsCubit>().getActors(
+                        search: _seachText.isEmpty ? null : _seachText,
+                      ),
+                  color: AppColors.green),
             );
           }
           return const Padding(
             padding: EdgeInsets.only(top: 80),
-            child: UILoadingIndicator(),
+            child: UILoadingIndicator(
+              color: AppColors.green,
+            ),
           );
         },
       ),

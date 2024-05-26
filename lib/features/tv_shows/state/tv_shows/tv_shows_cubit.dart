@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_app/features/tv_shows/data/repositories/cloud_tv_shows_repository.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
-import 'package:tv_app/features/tv_shows/state/tv_shows/tv_shows.state.dart';
+import 'package:tv_app/features/tv_shows/state/tv_shows/tv_show_state.dart';
 
 class TvShowsCubit extends Cubit<TvShowsState> {
   TvShowsCubit({

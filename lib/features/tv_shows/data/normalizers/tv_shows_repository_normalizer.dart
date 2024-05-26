@@ -1,3 +1,4 @@
+import 'package:tv_app/core/environment/environment_service.dart';
 import 'package:tv_app/core/helpers/html_helper.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_interface.dart';
@@ -14,7 +15,7 @@ class TvShowsRepositoryNormalizer {
         name: mapData['name'] as String,
         featuredImageUrl: mapData['image']?['medium'] as String? ??
             mapData['image']?['original'] as String? ??
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
+            EnvironmentService.placeHolderImageUrl,
         description: mapData['summary'] == null
             ? null
             : HtmlHelper.removeAllHtmlTags(mapData['summary'] as String),
@@ -52,11 +53,11 @@ class TvShowsRepositoryNormalizer {
             : HtmlHelper.removeAllHtmlTags(mapData['summary'] as String),
         featuredImageUrl: mapData['image']?['medium'] as String? ??
             mapData['image']?['original'] as String? ??
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1665px-No-Image-Placeholder.svg.png',
+            EnvironmentService.placeHolderImageUrl,
         season: mapData['season'] as int,
         number: mapData['number'] as int,
         airdate: mapData['airdate'] != null
-            ? DateTime.parse(mapData['airdate'] as String)
+            ? DateTime.tryParse(mapData['airdate'] as String)
             : null,
       );
 }

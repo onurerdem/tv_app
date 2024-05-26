@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tv_app/features/authentication/presentation/splash_screen.dart';
+import 'package:tv_app/features/authentication/presentation/screens/splash_screen.dart';
 
 class AuthenticationRoutes {
   AuthenticationRoutes._();

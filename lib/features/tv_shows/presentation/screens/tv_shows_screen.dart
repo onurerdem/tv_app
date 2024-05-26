@@ -12,7 +12,7 @@ import 'package:tv_app/core/design_system/widgets/texts/header_text_widget.dart'
 import 'package:tv_app/core/navigation/services/navigation_service.dart';
 import 'package:tv_app/features/tv_shows/presentation/widgets/tv_show_card_widget.dart';
 import 'package:tv_app/features/tv_shows/state/tv_shows/tv_shows_cubit.dart';
-import 'package:tv_app/features/tv_shows/state/tv_shows/tv_shows.state.dart';
+import 'package:tv_app/features/tv_shows/state/tv_shows/tv_show_state.dart';
 
 class TvShowsScreen extends StatefulWidget {
   const TvShowsScreen({super.key});
