@@ -52,6 +52,7 @@ class UIMainHeader extends StatelessWidget {
                 ),
               ),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (isProtected) ...[
                     Padding(

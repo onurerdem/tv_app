@@ -154,9 +154,7 @@ class UIBottomAppBar extends StatelessWidget {
             ? Colors.grey.shade900
             : AppColors.white;
       case TabType.settings:
-        return tabType == currentTapType
-            ? Colors.grey.shade900
-            : AppColors.white;
+        return AppColors.white;
     }
   }
 
@@ -169,7 +167,7 @@ class UIBottomAppBar extends StatelessWidget {
       case TabType.actors:
         return getIt<AppNavigationService>().routeToActors();
       case TabType.settings:
-        return;
+        getIt<AppNavigationService>().routeToSettings();
     }
   }
 

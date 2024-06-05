@@ -4,7 +4,7 @@ import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/fields/search_field_widget.dart';
 import 'package:tv_app/core/design_system/widgets/indicators/error_indicator_widget.dart';
 import 'package:tv_app/core/design_system/widgets/indicators/loading_indicator_widget.dart';
-import 'package:tv_app/core/design_system/widgets/layouts/bottom_app_bar.dart';
+import 'package:tv_app/core/design_system/widgets/layouts/bottom_app_bar_widget.dart';
 import 'package:tv_app/core/design_system/widgets/layouts/main_header_widget.dart';
 import 'package:tv_app/core/design_system/widgets/layouts/main_scaffold_widget.dart';
 import 'package:tv_app/core/design_system/widgets/pagination/infinity_scroll_pagination_widget.dart';
@@ -37,12 +37,15 @@ class _ActorsScreenState extends State<ActorsScreen> {
               fontSize: 32,
             ),
             const SizedBox(height: 8),
-            UISearchField(onSearchChanged: (String text) {
-              _seachText = text.trim();
-              context.read<ActorsCubit>().getActors(
-                    search: _seachText.isEmpty ? null : _seachText,
-                  );
-            }),
+            UISearchField(
+              onSearchChanged: (String text) {
+                _seachText = text.trim();
+                context.read<ActorsCubit>().getActors(
+                      search: _seachText.isEmpty ? null : _seachText,
+                    );
+              },
+              placeHolder: 'Search Actors',
+            ),
             const SizedBox(height: 12),
           ],
         ),

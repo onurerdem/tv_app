@@ -4,7 +4,7 @@ import 'package:tv_app/core/design_system/theme/colors.dart';
 import 'package:tv_app/core/design_system/widgets/buttons/back_button_widget.dart';
 import 'package:tv_app/core/design_system/widgets/buttons/button_widget.dart';
 import 'package:tv_app/core/design_system/widgets/buttons/icon_button_widget.dart';
-import 'package:tv_app/core/design_system/widgets/layouts/bottom_app_bar.dart';
+import 'package:tv_app/core/design_system/widgets/layouts/bottom_app_bar_widget.dart';
 import 'package:tv_app/core/design_system/widgets/layouts/main_header_widget.dart';
 
 class UIMainScaffold extends StatelessWidget {

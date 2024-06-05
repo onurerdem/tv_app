@@ -156,7 +156,7 @@ class _UISearchFieldState extends State<UISearchField> {
               color: Colors.grey.shade400,
               fontSize: 16,
             ),
-            hintText: 'Search',
+            hintText: widget.placeHolder ?? 'Search',
           ),
         ),
       ),

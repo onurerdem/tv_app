@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tv_app/core/navigation/routes/actors_screen.dart';
+import 'package:tv_app/core/navigation/routes/actors_routes.dart';
+import 'package:tv_app/core/navigation/routes/settings_routes.dart';
 import 'package:tv_app/core/navigation/routes/tv_shows_routes.dart';
 
 class AppNavigationService {
@@ -54,5 +55,9 @@ class AppNavigationService {
 
   void routeToActors() => _routeTo(
         ActorsRoutes.actorsRoute,
+      );
+
+  void routeToSettings() => _routeTo(
+        SettingsRoute.settingsRoute,
       );
 }
