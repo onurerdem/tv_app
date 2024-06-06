@@ -27,6 +27,7 @@ dependencies:
   glass_kit: ^3.0.0
   intl: ^0.18.1
   flutter_keyboard_visibility: ^6.0.0
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

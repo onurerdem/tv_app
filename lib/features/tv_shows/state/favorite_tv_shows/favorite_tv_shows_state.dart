@@ -11,13 +11,16 @@ class FavoriteTvShowsLoadingState extends FavoriteTvShowsState {
 class FavoriteTvShowsLoadedState extends FavoriteTvShowsState {
   FavoriteTvShowsLoadedState({
     required this.tvShows,
+    required this.tvShowsLength,
   });
 
   final List<ITvShow> tvShows;
+  final int tvShowsLength;
 
   @override
   List<Object?> get props => [
         tvShows,
+        tvShowsLength,
       ];
 }
 

@@ -11,13 +11,16 @@ class SelectedTvShowLoadingState extends SelectedTvShowState {
 class SelectedTvShowLoadedState extends SelectedTvShowState {
   SelectedTvShowLoadedState({
     required this.tvShow,
+    required this.isFavorite,
   });
 
   final ITvShow tvShow;
+  final bool isFavorite;
 
   @override
   List<Object?> get props => [
         tvShow,
+        isFavorite,
       ];
 }
 

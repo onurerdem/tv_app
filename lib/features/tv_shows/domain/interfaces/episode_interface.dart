@@ -1,5 +1,7 @@
-class IEpisode {
-  IEpisode({
+import 'package:equatable/equatable.dart';
+
+class IEpisode extends Equatable {
+  const IEpisode({
     required this.id,
     required this.name,
     required this.description,
@@ -16,4 +18,15 @@ class IEpisode {
   final int season;
   final int number;
   final DateTime? airdate;
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        description,
+        featuredImageUrl,
+        season,
+        number,
+        airdate,
+      ];
 }

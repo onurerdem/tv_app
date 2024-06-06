@@ -5,7 +5,10 @@ abstract class ILocalTvShowsRepository {
   Future<void> addFavoriteTvShow({
     required ITvShow tvShow,
   });
-  Future<void> remodeFavoriteTv({
+  Future<void> remodeFavoriteTvShow({
+    required String tvShowId,
+  });
+  Future<bool> isFavorite({
     required String tvShowId,
   });
 }

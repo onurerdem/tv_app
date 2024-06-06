@@ -39,7 +39,7 @@ class TvShowsRepositoryNormalizer {
               : null,
         ),
         network: mapData['network']?['name'] as String?,
-        episodes: [],
+        episodes: const [],
       );
 
   static IEpisode episodeFromMap({
@@ -60,4 +60,15 @@ class TvShowsRepositoryNormalizer {
             ? DateTime.tryParse(mapData['airdate'] as String)
             : null,
       );
+
+  static Map<String, dynamic> tvShowToMapData({required ITvShow tvShow}) =>
+      <String, dynamic>{
+        'id': int.parse(tvShow.id),
+        'name': tvShow.name,
+        'summary': tvShow.description,
+        'genres': tvShow.genres,
+        'image': {
+          'medium': tvShow.featuredImageUrl,
+        },
+      };
 }

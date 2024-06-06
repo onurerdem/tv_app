@@ -1,8 +1,9 @@
+import 'package:equatable/equatable.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/episode_interface.dart';
 import 'package:tv_app/features/tv_shows/domain/interfaces/tv_show_schedule_intertface.dart';
 
-class ITvShow {
-  ITvShow({
+class ITvShow extends Equatable {
+  const ITvShow({
     required this.id,
     required this.name,
     required this.featuredImageUrl,
@@ -41,4 +42,18 @@ class ITvShow {
         tvShowSchedule: tvShowSchedule,
         episodes: episodes ?? this.episodes,
       );
+
+  @override
+  List<Object?> get props => [
+        id,
+        name,
+        featuredImageUrl,
+        description,
+        genres,
+        premieredAt,
+        endedAt,
+        network,
+        tvShowSchedule,
+        episodes,
+      ];
 }

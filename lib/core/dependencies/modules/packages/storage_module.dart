@@ -1,12 +1,15 @@
 import 'package:injectable/injectable.dart';
 import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 @module
 abstract class StorageModule {
-  @lazySingleton
-  HiveInterface hiveInterface() {
+  @preResolve
+  @singleton
+  Future<HiveInterface> hiveInterface() async {
     final HiveInterface hive = Hive;
-    hive.init(null);
+    final appDocumentDirectory = await getApplicationDocumentsDirectory();
+    hive.init(appDocumentDirectory.path);
     return hive;
   }
 }
