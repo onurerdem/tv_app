@@ -20,6 +20,7 @@ class UITextField extends StatefulWidget {
     this.trailingIcon,
     this.prefixIcon,
     this.initialValue,
+    this.minLenght,
     this.isDisabled = false,
     this.primaryColor = AppColors.primary,
     this.maxLength = 70,
@@ -35,6 +36,7 @@ class UITextField extends StatefulWidget {
   final bool isDisabled;
   final TextEditingController controller;
   final bool whiteBackground;
+  final int? minLenght;
   final Widget? trailingIcon;
   final Widget? prefixIcon;
   final String? initialValue;
@@ -117,6 +119,11 @@ class UITextFieldState extends State<UITextField> {
                         return 'This field should not be empty';
                       }
                     }
+                    if (widget.minLenght != null &&
+                        value!.length < widget.minLenght!) {
+                      return 'Short PIN';
+                    }
+
                     return null;
                   },
                   autofocus: widget.autofocus,
