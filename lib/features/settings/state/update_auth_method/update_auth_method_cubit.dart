@@ -15,7 +15,7 @@ class UpdateAuthMethodCubit extends Cubit<UpdateAuthMethodState> {
   final EventBus eventBus;
 
   Future<UpdateAuthMethodState> updateAuthMethod({
-    required AuthMethodType authMethodType,
+    required List<AuthMethodType> authMethodTypes,
     required String? authPin,
   }) async {
     try {
@@ -28,11 +28,11 @@ class UpdateAuthMethodCubit extends Cubit<UpdateAuthMethodState> {
       }
 
       await authMethodRepository.saveAuthMethod(
-        authMethodType: authMethodType,
+        authMethodTypes: authMethodTypes,
       );
 
       eventBus.fire(AuthMethodUpdateEvent(
-        authMethodType: authMethodType,
+        authMethodTypes: authMethodTypes,
         authPin: authPin,
       ));
 

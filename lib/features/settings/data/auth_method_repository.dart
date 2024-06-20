@@ -10,31 +10,34 @@ class AuthMethodRepository extends IAuthMethodRepository {
   final HiveInterface hive;
 
   @override
-  Future<AuthMethodType> getAuthMethod() async {
+  Future<List<AuthMethodType>> getAuthMethods() async {
     final Box<dynamic> box = await Hive.openBox('auth_method');
 
     final String authMethodTypeString = await box.get(
       'auth_method_type',
-      defaultValue: 'none',
+      defaultValue: [],
     );
 
-    final AuthMethodType authMethodType = AuthMethodType.values
-        .firstWhere((AuthMethodType e) => e.name == authMethodTypeString);
+    final List<AuthMethodType> authMethodTypes = AuthMethodType.values
+        .where(
+          (AuthMethodType e) => authMethodTypeString.contains(e.name),
+        )
+        .toList();
 
     await box.close();
 
-    return authMethodType;
+    return authMethodTypes;
   }
 
   @override
   Future<void> saveAuthMethod({
-    required AuthMethodType authMethodType,
+    required List<AuthMethodType> authMethodTypes,
   }) async {
     final Box<dynamic> box = await Hive.openBox('auth_method');
 
     await box.put(
       'auth_method_type',
-      authMethodType.name,
+      authMethodTypes.map((e) => e.name).toList(),
     );
 
     await box.close();

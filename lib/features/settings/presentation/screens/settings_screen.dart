@@ -66,7 +66,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             AuthMethodState state,
           ) {
             if (state is AuthMethodLoadedState) {
-              _pinController.text = state.authPin ?? '';
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                _pinController.text = state.authPin ?? '';
+              });
 
               return ListView(
                 padding: const EdgeInsets.only(
@@ -80,17 +82,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   AuthMethodCardSelector(
                     title: 'Enable Pin Authentication',
                     text: 'Authenticate with a pin number.',
-                    isSelected: state.authMethodType == AuthMethodType.pin,
+                    isSelected:
+                        state.authMethodTypes.contains(AuthMethodType.pin),
                     onSelected: () {
-                      if (state.authMethodType != AuthMethodType.pin) {
+                      if (!state.authMethodTypes.contains(AuthMethodType.pin)) {
                         if (_formKey.currentState?.validate() ?? false) {
-                          _updatePinMethod(
-                            authMethodType: AuthMethodType.pin,
+                          _updateAuthMethod(
+                            authMethodTypes: [
+                              AuthMethodType.pin,
+                              ...state.authMethodTypes,
+                            ],
                           );
                         }
                       } else {
-                        _updatePinMethod(
-                          authMethodType: AuthMethodType.none,
+                        _updateAuthMethod(
+                          authMethodTypes: state.authMethodTypes
+                              .where((e) => e != AuthMethodType.pin)
+                              .toList(),
                         );
                       }
                     },
@@ -110,17 +118,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                   ),
-                  if (_hasDeviceAuthentication) ...[
+                  if (_hasDeviceAuthentication &&
+                      state.authMethodTypes.contains(AuthMethodType.pin)) ...[
                     const SizedBox(height: 12),
                     AuthMethodCardSelector(
                       title: 'Enable Device Authentication',
-                      text:
-                          'Authenticate with your device biometrics authentication.',
-                      isSelected: state.authMethodType == AuthMethodType.device,
-                      onSelected: () => _updatePinMethod(
-                        authMethodType: AuthMethodType.device,
-                      ),
-                    ),
+                        text:
+                            'Authenticate with your device biometrics authentication.',
+                        isSelected: state.authMethodTypes
+                            .contains(AuthMethodType.device),
+                        onSelected: () {
+                          if (!state.authMethodTypes
+                              .contains(AuthMethodType.device)) {
+                            _updateAuthMethod(
+                              authMethodTypes: [
+                                AuthMethodType.device,
+                                ...state.authMethodTypes,
+                              ],
+                            );
+                          } else {
+                            _updateAuthMethod(
+                              authMethodTypes: state.authMethodTypes
+                                  .where((e) => e != AuthMethodType.device)
+                                  .toList(),
+                            );
+                          }
+                        }),
                   ],
                 ],
               );
@@ -128,13 +151,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (state is AuthMethodErrorState) {
               return Center(
                 child: UIErrorIndicator(
-                  errorText: 'Failed to load auth method.',
+                  errorText: 'Failed to load auth methods.',
                   onPressed: context.read<AuthMethodCubit>().getAuthMethod,
+                  color: AppColors.purple,
                 ),
               );
             }
             return const Center(
-              child: UILoadingIndicator(),
+              child: UILoadingIndicator(
+                color: AppColors.purple,
+              ),
             );
           },
         ),
@@ -145,15 +171,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<void> _updatePinMethod({
-    required AuthMethodType authMethodType,
+  Future<void> _updateAuthMethod({
+    required List<AuthMethodType> authMethodTypes,
   }) async {
-    if (authMethodType != AuthMethodType.pin) {
+    if (!authMethodTypes.contains(AuthMethodType.pin)) {
       _pinController.clear();
     }
     UpdateAuthMethodState updateAuthMethodState =
         await context.read<UpdateAuthMethodCubit>().updateAuthMethod(
-              authMethodType: authMethodType,
+              authMethodTypes: authMethodTypes,
               authPin: _pinController.text.isEmpty ? null : _pinController.text,
             );
 

@@ -21,7 +21,7 @@ class AuthMethodCubit extends Cubit<AuthMethodState> {
   Future<void> initialize() async {
     _authMethodEventSubscription = eventBus.on<AuthMethodUpdateEvent>().listen(
           (AuthMethodUpdateEvent event) => _updateAuthEvent(
-            authMethodType: event.authMethodType,
+            authMethodTypes: event.authMethodTypes,
             authPin: event.authPin,
           ),
         );
@@ -39,22 +39,22 @@ class AuthMethodCubit extends Cubit<AuthMethodState> {
 
       final String? authPin = await authMethodRepository.getAuthPin();
 
-      final AuthMethodType authMethodType =
-          await authMethodRepository.getAuthMethod();
+      final List<AuthMethodType> authMethodTypes =
+          await authMethodRepository.getAuthMethods();
 
       emit(AuthMethodLoadedState(
-          authPin: authPin, authMethodType: authMethodType));
-    } catch (e) {
+          authPin: authPin, authMethodTypes: authMethodTypes));
+    } catch (e, _) {
       emit(AuthMethodErrorState());
     }
   }
 
   void _updateAuthEvent({
-    required AuthMethodType authMethodType,
+    required List<AuthMethodType> authMethodTypes,
     required String? authPin,
   }) {
     emit(AuthMethodLoadedState(
-      authMethodType: authMethodType,
+      authMethodTypes: authMethodTypes,
       authPin: authPin,
     ));
   }

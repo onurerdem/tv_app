@@ -1,9 +1,9 @@
 import 'package:tv_app/features/settings/domain/enums/auth_method_type_enum.dart';
 
 abstract class IAuthMethodRepository {
-  Future<AuthMethodType> getAuthMethod();
+  Future<List<AuthMethodType>> getAuthMethods();
   Future<void> saveAuthMethod({
-    required AuthMethodType authMethodType,
+    required List<AuthMethodType> authMethodTypes,
   });
   Future<String?> getAuthPin();
   Future<void> saveAuthPin({

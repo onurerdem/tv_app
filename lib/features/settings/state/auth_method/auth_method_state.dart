@@ -10,16 +10,16 @@ class AuthMethodLoadingState extends AuthMethodState {
 
 class AuthMethodLoadedState extends AuthMethodState {
   AuthMethodLoadedState({
-    required this.authMethodType,
+    required this.authMethodTypes,
     required this.authPin,
   });
 
-  final AuthMethodType authMethodType;
+  final List<AuthMethodType> authMethodTypes;
   final String? authPin;
 
   @override
   List<Object?> get props => [
-        authMethodType,
+        authMethodTypes,
         authPin,
       ];
 }

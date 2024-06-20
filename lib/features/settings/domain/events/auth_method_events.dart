@@ -3,10 +3,10 @@ import 'package:tv_app/features/settings/domain/enums/auth_method_type_enum.dart
 
 class AuthMethodUpdateEvent extends EventBusMessage {
   AuthMethodUpdateEvent({
-    required this.authMethodType,
+    required this.authMethodTypes,
     required this.authPin,
   });
 
-  final AuthMethodType authMethodType;
+  final List<AuthMethodType> authMethodTypes;
   final String? authPin;
 }
