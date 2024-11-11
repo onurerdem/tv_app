@@ -8,6 +8,7 @@ import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
 import 'features/series/domain/usecases/search_series.dart';
 import 'core/network/api_client.dart';
+import 'features/series/presentation/bloc/series_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -30,4 +31,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SearchSeries(sl<SeriesRepository>()));
 
   sl.registerLazySingleton(() => GetAllSeries(sl<SeriesRepository>()));
+
+  sl.registerFactory(() => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()));
 }
