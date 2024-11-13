@@ -4,15 +4,27 @@ import '../bloc/series_bloc.dart';
 import '../bloc/series_event.dart';
 import '../bloc/series_state.dart';
 
-class SeriesPage extends StatelessWidget {
+class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});
+
+  @override
+  State<SeriesPage> createState() => _SeriesPageState();
+}
+
+class _SeriesPageState extends State<SeriesPage> {
+  late SeriesBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = context.read<SeriesBloc>();
+    bloc.add(GetAllSeriesEvent());
+  }
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController _controller = TextEditingController();
     final bloc = context.read<SeriesBloc>();
-
-    bloc.add(GetAllSeriesEvent());
 
     return Scaffold(
       appBar: AppBar(title: const Text('Series')),
@@ -57,15 +69,54 @@ class SeriesPage extends StatelessWidget {
                   if (state is SeriesLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is SeriesLoaded) {
-                    return ListView.builder(
+                    return ListView.separated(
+                      separatorBuilder: (context, index) => const Divider(),
                       itemCount: state.seriesList.length,
                       itemBuilder: (context, index) {
                         final series = state.seriesList[index];
-                        return ListTile(
-                          title: Text(series.name),
-                          leading: series.imageUrl != null
-                              ? Image.network(series.imageUrl!)
-                              : null,
+                        return Row(
+                          children: [
+                            SizedBox(
+                              height: 160,
+                              child: series.imageUrl != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(16.0),
+                                      child: Image.network(
+                                        series.imageUrl!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : null,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    series.name,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    series.summary != null
+                                        ? "${series.summary?.replaceAll(RegExp(r'<[^>]*>'), '')}"
+                                        : "Explanation not available.",
+                                    style: const TextStyle(fontSize: 12),
+                                    maxLines: 4,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    series.genres.isNotEmpty
+                                        ? series.genres.join(', ')
+                                        : "No species information available.",
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         );
                       },
                     );
