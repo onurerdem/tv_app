@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/series_bloc.dart';
 import '../bloc/series_event.dart';
 import '../bloc/series_state.dart';
+import 'serie_detail_page.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});
@@ -45,7 +46,7 @@ class _SeriesPageState extends State<SeriesPage> {
                 cursorColor: Colors.black,
                 decoration: InputDecoration(
                   labelText: 'Search for series.',
-                  floatingLabelStyle: TextStyle(
+                  floatingLabelStyle: const TextStyle(
                     color: Colors.black,
                   ),
                   suffixIcon: IconButton(
@@ -82,50 +83,62 @@ class _SeriesPageState extends State<SeriesPage> {
                         itemCount: state.seriesList.length,
                         itemBuilder: (context, index) {
                           final series = state.seriesList[index];
-                          return Row(
-                            children: [
-                              SizedBox(
-                                height: 160,
-                                child: series.imageUrl != null
-                                    ? ClipRRect(
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
-                                        child: Image.network(
-                                          series.imageUrl!,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      )
-                                    : null,
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      series.name,
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      series.summary != null
-                                          ? "${series.summary?.replaceAll(RegExp(r'<[^>]*>'), '')}"
-                                          : "Explanation not available.",
-                                      style: const TextStyle(fontSize: 12),
-                                      maxLines: 4,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      series.genres.isNotEmpty
-                                          ? series.genres.join(', ')
-                                          : "No species information available.",
-                                      style: const TextStyle(fontSize: 12),
-                                    ),
-                                  ],
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SerieDetailPage(serie: series),
                                 ),
-                              ),
-                            ],
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 160,
+                                  child: series.imageUrl != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
+                                          child: Image.network(
+                                            series.imageUrl!,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : null,
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        series.name,
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        series.summary != null
+                                            ? "${series.summary?.replaceAll(RegExp(r'<[^>]*>'), '')}"
+                                            : "Explanation not available.",
+                                        style: const TextStyle(fontSize: 12),
+                                        maxLines: 4,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Text(
+                                        series.genres.isNotEmpty
+                                            ? series.genres.join(', ')
+                                            : "No species information available.",
+                                        style: const TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
                           );
                         },
                       );
