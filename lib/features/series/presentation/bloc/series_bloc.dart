@@ -14,8 +14,8 @@ class SeriesBloc extends Bloc<SeriesEvent, SeriesState> {
       emit(SeriesLoading());
       final result = await getAllSeries(NoParams());
       result.fold(
-            (failure) => emit(SeriesError("Failed to load series")),
-            (series) => emit(SeriesLoaded(series)),
+        (failure) => emit(SeriesError("Failed to load series.")),
+        (series) => emit(SeriesLoaded(series)),
       );
     });
 
@@ -26,8 +26,8 @@ class SeriesBloc extends Bloc<SeriesEvent, SeriesState> {
       } else {
         final result = await searchSeries(event.query);
         result.fold(
-              (failure) => emit(SeriesError("Failed to load search results")),
-              (series) => emit(SeriesLoaded(series)),
+          (failure) => emit(SeriesError("Failed to load search results.")),
+          (series) => emit(SeriesLoaded(series)),
         );
       }
     });

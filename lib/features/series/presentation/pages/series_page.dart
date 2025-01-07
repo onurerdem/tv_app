@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:tv_app/features/series/presentation/pages/serie_detail_page.dart';
+import '../../domain/usecases/get_serie_details.dart';
+import '../bloc/serie_details_bloc.dart';
+import '../bloc/serie_details_event.dart';
 import '../bloc/series_bloc.dart';
 import '../bloc/series_event.dart';
 import '../bloc/series_state.dart';
-import 'serie_detail_page.dart';
 
 class SeriesPage extends StatefulWidget {
   const SeriesPage({super.key});
@@ -32,6 +36,7 @@ class _SeriesPageState extends State<SeriesPage> {
   Widget build(BuildContext context) {
     final TextEditingController _controller = TextEditingController();
     final bloc = context.read<SeriesBloc>();
+    final di = GetIt.instance;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Series')),
@@ -88,8 +93,12 @@ class _SeriesPageState extends State<SeriesPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      SerieDetailPage(serie: series),
+                                  builder: (_) => BlocProvider(
+                                    create: (context) => SerieDetailsBloc(
+                                        di<GetSerieDetails>())
+                                      ..add(GetSerieDetailsEvent(series.id)),
+                                    child: SerieDetailPage(serieId: series.id),
+                                  ),
                                 ),
                               );
                             },

@@ -28,4 +28,14 @@ class SeriesRepositoryImpl implements SeriesRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, Series>> getSerieDetails(int serieId) async {
+    try {
+      final serie = await remoteDataSource.getSerieDetails(serieId);
+      return Right(serie);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
 }

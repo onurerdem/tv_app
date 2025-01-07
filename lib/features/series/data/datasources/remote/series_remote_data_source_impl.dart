@@ -32,4 +32,14 @@ class SeriesRemoteDataSourceImpl implements SeriesRemoteDataSource {
       throw ServerException();
     }
   }
+
+  @override
+  Future<SeriesModel> getSerieDetails(int serieId) async {
+    final response = await apiClient.get('$GET_SHOWS/${serieId}');
+    if (response.statusCode == 200) {
+      return SeriesModel.fromJson(response.data);
+    } else {
+      throw ServerException();
+    }
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'features/series/domain/usecases/get_serie_details.dart';
+import 'features/series/presentation/bloc/serie_details_bloc.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
 import 'features/series/presentation/pages/series_page.dart';
 import 'injection_container.dart' as di;
@@ -38,6 +40,9 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(
             create: (_) => di.sl<SeriesBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => SerieDetailsBloc(di.sl<GetSerieDetails>()),
           ),
         ],
         child: const SeriesPage(),

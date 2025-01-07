@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:tv_app/core/utils/constants.dart';
 import 'package:tv_app/features/series/data/datasources/remote/series_remote_data_source_impl.dart';
 import 'package:tv_app/features/series/domain/usecases/get_all_series.dart';
+import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
+import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
@@ -32,5 +34,9 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => GetAllSeries(sl<SeriesRepository>()));
 
+  sl.registerLazySingleton(() => GetSerieDetails(sl<SeriesRepository>()));
+
   sl.registerFactory(() => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()));
+
+  sl.registerFactory(() => SerieDetailsBloc(sl<GetSerieDetails>()));
 }
