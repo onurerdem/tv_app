@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tv_app/features/series/presentation/pages/splash_screen.dart';
 import 'features/series/domain/usecases/get_serie_details.dart';
 import 'features/series/presentation/bloc/serie_details_bloc.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
-import 'features/series/presentation/pages/series_page.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -16,27 +16,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Series',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        inputDecorationTheme: InputDecorationTheme(
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(32.0),
-            borderSide: const BorderSide(
-              width: 4.0,
-            ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(32.0),
-            borderSide: const BorderSide(
-              width: 4.0,
-            ),
-          ),
-        ),
-      ),
-      home: MultiBlocProvider(
+    return MultiBlocProvider(
         providers: [
           BlocProvider(
             create: (_) => di.sl<SeriesBloc>(),
@@ -45,8 +25,28 @@ class MyApp extends StatelessWidget {
             create: (_) => SerieDetailsBloc(di.sl<GetSerieDetails>()),
           ),
         ],
-        child: const SeriesPage(),
-      ),
+        child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Series',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              inputDecorationTheme: InputDecorationTheme(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                  borderSide: const BorderSide(
+                    width: 4.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(32.0),
+                  borderSide: const BorderSide(
+                    width: 4.0,
+                  ),
+                ),
+              ),
+            ),
+            home: const SplashScreen(),
+        ),
     );
   }
 }
