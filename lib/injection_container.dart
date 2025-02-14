@@ -17,6 +17,8 @@ import 'features/authentication/domain/usacases/is_sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_out_usecase.dart';
 import 'features/authentication/domain/usacases/sign_up_usecase.dart';
+import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
+import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
@@ -51,6 +53,16 @@ Future<void> init() async {
   sl.registerFactory(() => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()));
 
   sl.registerFactory(() => SerieDetailsBloc(sl<GetSerieDetails>()));
+
+  sl.registerFactory<AuthenticationCubit>(() => AuthenticationCubit(
+      isSignInUseCase: sl.call(),
+      signOutUseCase: sl.call(),
+      getCurrentUidUseCase: sl.call()));
+  sl.registerFactory<UserCubit>(() => UserCubit(
+    getCreateCurrentUserUseCase: sl.call(),
+    signInUseCase: sl.call(),
+    signUPUseCase: sl.call(),
+  ));
 
   sl.registerLazySingleton<GetCreateCurrentUserUsecase>(
           () => GetCreateCurrentUserUsecase(repository: sl.call()));
