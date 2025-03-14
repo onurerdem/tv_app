@@ -1,14 +1,16 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
 import 'package:tv_app/features/series/presentation/pages/series_page.dart';
 
 import '../bloc/series_bloc.dart';
 import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -27,20 +29,34 @@ class _SplashScreenState extends State<SplashScreen> {
     final prefs = await SharedPreferences.getInstance();
     final onboardingCompleted = prefs.getBool('onboardingCompleted') ?? false;
 
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    final isSignedInWithFirebase = firebaseUser != null;
+
     if (onboardingCompleted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: BlocProvider.of<SeriesBloc>(context),
-            child: const SeriesPage(),
+      if (isSignedInWithFirebase) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BlocProvider.value(
+              value: BlocProvider.of<SeriesBloc>(context),
+              child: SeriesPage(uid: firebaseUser.uid),
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const SignInPage(),
+          ),
+        );
+      }
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const OnboardingScreen()),
+        MaterialPageRoute(
+          builder: (context) => const OnboardingScreen(),
+        ),
       );
     }
   }

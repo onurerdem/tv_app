@@ -5,6 +5,7 @@ import '../../domain/entities/user_entity.dart';
 class UserModel extends UserEntity{
   const UserModel({
     super.name,
+    super.username,
     super.email,
     super.uid,
     super.status = null,
@@ -17,6 +18,7 @@ class UserModel extends UserEntity{
       name: documentSnapshot.get('name'),
       uid: documentSnapshot.get('uid'),
       email: documentSnapshot.get('email'),
+      username: documentSnapshot.get('username'),
     );
   }
 
@@ -25,7 +27,8 @@ class UserModel extends UserEntity{
       "status": status,
       "uid": uid,
       "email": email,
-      "name": name
+      "name": name,
+      "username": username,
     };
   }
 

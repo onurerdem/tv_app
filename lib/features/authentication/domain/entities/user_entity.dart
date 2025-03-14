@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class UserEntity extends Equatable {
   final String? name;
+  final String? username;
   final String? email;
   final String? uid;
   final String? status;
@@ -9,9 +10,10 @@ class UserEntity extends Equatable {
 
   const UserEntity({
     this.name,
+    this.username,
     this.email,
     this.uid,
-    this.status = "Hello there! I'm using this app",
+    this.status = "Hello there! I'm using this app.",
     this.password,
   });
 
@@ -19,6 +21,7 @@ class UserEntity extends Equatable {
   // TODO: implement props
   List<Object?> get props => [
     name,
+    username,
     email,
     uid,
     status,

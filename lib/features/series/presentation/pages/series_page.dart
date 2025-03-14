@@ -11,7 +11,8 @@ import '../bloc/series_state.dart';
 import '../widgets/show_exit_dialog.dart';
 
 class SeriesPage extends StatefulWidget {
-  const SeriesPage({super.key});
+  final String uid;
+  const SeriesPage({super.key,required this.uid});
 
   @override
   State<SeriesPage> createState() => _SeriesPageState();

@@ -11,6 +11,7 @@ import 'features/authentication/data/datasources/firebase_remote_data_source.dar
 import 'features/authentication/data/datasources/remote/firebase_remote_data_source_impl.dart';
 import 'features/authentication/data/repositories/firebase_repository_impl.dart';
 import 'features/authentication/domain/repositories/firebase_repository.dart';
+import 'features/authentication/domain/usacases/forgot_password_usecase.dart';
 import 'features/authentication/domain/usacases/get_create_current_user_usecase.dart';
 import 'features/authentication/domain/usacases/get_current_uid_usecase.dart';
 import 'features/authentication/domain/usacases/is_sign_in_usecase.dart';
@@ -29,7 +30,6 @@ import 'features/series/presentation/bloc/series_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-
   sl.registerLazySingleton(() {
     final dio = Dio();
     dio.options.baseUrl = BASE_URL;
@@ -39,10 +39,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() => ApiClient(sl<Dio>()));
 
   sl.registerLazySingleton<SeriesRemoteDataSource>(
-          () => SeriesRemoteDataSourceImpl(sl<ApiClient>()));
+      () => SeriesRemoteDataSourceImpl(sl<ApiClient>()));
 
   sl.registerLazySingleton<SeriesRepository>(
-          () => SeriesRepositoryImpl(sl<SeriesRemoteDataSource>()));
+      () => SeriesRepositoryImpl(sl<SeriesRemoteDataSource>()));
 
   sl.registerLazySingleton(() => SearchSeries(sl<SeriesRepository>()));
 
@@ -59,26 +59,29 @@ Future<void> init() async {
       signOutUseCase: sl.call(),
       getCurrentUidUseCase: sl.call()));
   sl.registerFactory<UserCubit>(() => UserCubit(
-    getCreateCurrentUserUseCase: sl.call(),
-    signInUseCase: sl.call(),
-    signUPUseCase: sl.call(),
-  ));
+        getCreateCurrentUserUseCase: sl.call(),
+        signInUseCase: sl.call(),
+        signUpUseCase: sl.call(),
+        forgotPasswordUseCase: sl.call(),
+      ));
 
   sl.registerLazySingleton<GetCreateCurrentUserUsecase>(
-          () => GetCreateCurrentUserUsecase(repository: sl.call()));
+      () => GetCreateCurrentUserUsecase(repository: sl.call()));
   sl.registerLazySingleton<GetCurrentUidUseCase>(
-          () => GetCurrentUidUseCase(repository: sl.call()));
+      () => GetCurrentUidUseCase(repository: sl.call()));
   sl.registerLazySingleton<IsSignInUseCase>(
-          () => IsSignInUseCase(repository: sl.call()));
+      () => IsSignInUseCase(repository: sl.call()));
   sl.registerLazySingleton<SignInUseCase>(
-          () => SignInUseCase(repository: sl.call()));
+      () => SignInUseCase(repository: sl.call()));
   sl.registerLazySingleton<SignOutUseCase>(
-          () => SignOutUseCase(repository: sl.call()));
-  sl.registerLazySingleton<SignUPUseCase>(
-          () => SignUPUseCase(repository: sl.call()));
+      () => SignOutUseCase(repository: sl.call()));
+  sl.registerLazySingleton<SignUpUseCase>(
+      () => SignUpUseCase(repository: sl.call()));
+  sl.registerLazySingleton<ForgotPasswordUseCase>(
+      () => ForgotPasswordUseCase(repository: sl.call()));
 
   sl.registerLazySingleton<FirebaseRepository>(
-          () => FirebaseRepositoryImpl(remoteDataSource: sl.call()));
+      () => FirebaseRepositoryImpl(remoteDataSource: sl.call()));
 
   sl.registerLazySingleton<FirebaseRemoteDataSource>(() =>
       FirebaseRemoteDataSourceImpl(auth: sl.call(), firestore: sl.call()));

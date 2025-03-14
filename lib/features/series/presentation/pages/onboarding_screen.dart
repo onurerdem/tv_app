@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:tv_app/features/series/presentation/pages/series_page.dart';
-import '../bloc/series_bloc.dart';
+import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
 import '../widgets/show_exit_dialog.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -46,10 +43,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => BlocProvider.value(
-          value: BlocProvider.of<SeriesBloc>(context),
-          child: const SeriesPage(),
-        ),
+        builder: (context) => const SignInPage(),
       ),
     );
   }
@@ -149,7 +143,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
             _onboardingData.length,
-                (index) => _buildDot(index),
+            (index) => _buildDot(index),
           ),
         ),
         const SizedBox(height: 20),
