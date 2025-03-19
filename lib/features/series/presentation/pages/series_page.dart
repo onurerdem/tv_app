@@ -8,7 +8,6 @@ import '../bloc/serie_details_event.dart';
 import '../bloc/series_bloc.dart';
 import '../bloc/series_event.dart';
 import '../bloc/series_state.dart';
-import '../widgets/show_exit_dialog.dart';
 
 class SeriesPage extends StatefulWidget {
   final String uid;
@@ -45,8 +44,6 @@ class _SeriesPageState extends State<SeriesPage> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return;
-        } else if (!didPop) {
-          showExitDialog(context);
         }
       },
       child: Scaffold(

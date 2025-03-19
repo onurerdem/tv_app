@@ -20,6 +20,7 @@ import 'features/authentication/domain/usacases/sign_out_usecase.dart';
 import 'features/authentication/domain/usacases/sign_up_usecase.dart';
 import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
+import 'features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
@@ -91,4 +92,6 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => auth);
   sl.registerLazySingleton(() => fireStore);
+
+  sl.registerFactory(() => NavigationBloc());
 }

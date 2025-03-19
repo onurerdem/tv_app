@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
-import 'package:tv_app/features/series/presentation/pages/series_page.dart';
 
+import '../../../navigation/presentation/pages/main_page.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/user/user_cubit.dart';
 import '../widgets/snack_bar_error.dart';
@@ -40,7 +40,7 @@ class _SignUpPageState extends State<SignUpPage> {
             return BlocBuilder<AuthenticationCubit, AuthenticationState>(
               builder: (context, authenticationState) {
                 if (authenticationState is Authenticated) {
-                  return SeriesPage(uid: authenticationState.uid);
+                  return MainPage();
                 } else {
                   return _bodyWidget();
                 }
@@ -113,15 +113,14 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               Container(
                 height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
                   controller: _usernameController,
                   cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    hintText: 'Enter an username.',
+                    labelText: 'Enter an username.',
                     border: InputBorder.none,
                     floatingLabelStyle: TextStyle(
                       color: Colors.black,
@@ -134,15 +133,14 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               Container(
                 height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
                   controller: _emailController,
                   cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your email.',
+                    labelText: 'Enter your email.',
                     border: InputBorder.none,
                     floatingLabelStyle: TextStyle(
                       color: Colors.black,
@@ -155,16 +153,15 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               Container(
                 height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
                   obscureText: true,
                   controller: _passwordController,
                   cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your password.',
+                    labelText: 'Enter your password.',
                     border: InputBorder.none,
                     floatingLabelStyle: TextStyle(
                       color: Colors.black,

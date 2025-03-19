@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_up_page.dart';
-import 'package:tv_app/features/series/presentation/pages/series_page.dart';
 
+import '../../../navigation/presentation/pages/main_page.dart';
 import '../../../series/presentation/widgets/show_exit_dialog.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/authentication/authentication_cubit.dart';
@@ -52,7 +52,7 @@ class _SignInPageState extends State<SignInPage> {
               return BlocBuilder<AuthenticationCubit, AuthenticationState>(
                   builder: (context, authenticationState) {
                 if (authenticationState is Authenticated) {
-                  return SeriesPage(uid: authenticationState.uid);
+                  return MainPage();
                 } else {
                   return _bodyWidget();
                 }
@@ -97,15 +97,14 @@ class _SignInPageState extends State<SignInPage> {
               ),
               Container(
                 height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
                   controller: _usernameOrEmailController,
                   cursorColor: Colors.black,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your email or username.',
+                    labelText: 'Enter your email or username.',
                     border: InputBorder.none,
                     floatingLabelStyle: TextStyle(
                       color: Colors.black,
@@ -118,16 +117,15 @@ class _SignInPageState extends State<SignInPage> {
               ),
               Container(
                 height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  borderRadius: const BorderRadius.all(Radius.circular(24)),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
                   controller: _passwordController,
                   cursorColor: Colors.black,
                   obscureText: true,
                   decoration: const InputDecoration(
-                    hintText: 'Enter your password.',
+                    labelText: 'Enter your password.',
                     border: InputBorder.none,
                     floatingLabelStyle: TextStyle(
                       color: Colors.black,
