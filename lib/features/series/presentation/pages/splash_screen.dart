@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
 
+import '../../../navigation/presentation/bloc/navigation_bloc.dart';
 import '../../../navigation/presentation/pages/main_page.dart';
 import 'onboarding_screen.dart';
 
@@ -35,7 +37,10 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => MainPage(),
+            builder: (context) => BlocProvider.value(
+              value: BlocProvider.of<NavigationBloc>(context),
+              child: MainPage(),
+            ),
           ),
         );
       } else {

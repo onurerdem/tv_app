@@ -7,14 +7,14 @@ Future<void> showExitDialog(context) async {
     barrierDismissible: true,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text(
+        title: const Text(
           'Exit',
           style: TextStyle(
             color: Colors.red,
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Text(
+        content: const Text(
           'Are you sure you want to exit the app?',
           style: TextStyle(fontSize: 16),
         ),

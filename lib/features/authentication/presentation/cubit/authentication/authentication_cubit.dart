@@ -13,43 +13,41 @@ class AuthenticationCubit extends Cubit<AuthenticationState> {
   final GetCurrentUidUseCase getCurrentUidUseCase;
   final IsSignInUseCase isSignInUseCase;
   final SignOutUseCase signOutUseCase;
-  AuthenticationCubit({required this.isSignInUseCase,required this.signOutUseCase,required this.getCurrentUidUseCase}) : super(AuthenticationInitial());
+  AuthenticationCubit({
+    required this.isSignInUseCase,
+    required this.signOutUseCase,
+    required this.getCurrentUidUseCase,
+  }) : super(AuthenticationInitial());
 
-  Future<void> appStarted()async{
-    try{
-      final isSignIn=await isSignInUseCase.call();
-      if (isSignIn){
-        final uid=await getCurrentUidUseCase.call();
+  Future<void> appStarted() async {
+    try {
+      final isSignIn = await isSignInUseCase.call();
+      if (isSignIn) {
+        final uid = await getCurrentUidUseCase.call();
         emit(Authenticated(uid: uid));
-      }else{
+      } else {
         emit(UnAuthenticated());
       }
-
-
-    }on SocketException catch(_){
+    } on SocketException catch (_) {
       emit(UnAuthenticated());
     }
-
-
   }
 
-
-  Future<void> loggedIn()async{
-    try{
-      final uid=await getCurrentUidUseCase.call();
+  Future<void> loggedIn() async {
+    try {
+      final uid = await getCurrentUidUseCase.call();
       emit(Authenticated(uid: uid));
-    }on SocketException catch(_){
+    } on SocketException catch (_) {
       emit(UnAuthenticated());
     }
-
   }
-  Future<void> loggedOut()async{
-    try{
+
+  Future<void> loggedOut() async {
+    try {
       await signOutUseCase.call();
       emit(UnAuthenticated());
-    }on SocketException catch(_){
+    } on SocketException catch (_) {
       emit(UnAuthenticated());
     }
-
   }
 }

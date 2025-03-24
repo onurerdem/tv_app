@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../domain/entities/user_entity.dart';
 
-class UserModel extends UserEntity{
+class UserModel extends UserEntity {
   const UserModel({
     super.name,
     super.username,
@@ -12,7 +12,7 @@ class UserModel extends UserEntity{
     super.password,
   });
 
-  factory UserModel.fromSnapshot(DocumentSnapshot documentSnapshot){
+  factory UserModel.fromSnapshot(DocumentSnapshot documentSnapshot) {
     return UserModel(
       status: documentSnapshot.get('status'),
       name: documentSnapshot.get('name'),
@@ -22,7 +22,7 @@ class UserModel extends UserEntity{
     );
   }
 
-  Map<String,dynamic> toDocument(){
+  Map<String, dynamic> toDocument() {
     return {
       "status": status,
       "uid": uid,
@@ -31,5 +31,4 @@ class UserModel extends UserEntity{
       "username": username,
     };
   }
-
 }

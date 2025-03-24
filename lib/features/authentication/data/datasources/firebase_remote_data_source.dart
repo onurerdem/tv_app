@@ -1,6 +1,6 @@
 import '../../domain/entities/user_entity.dart';
 
-abstract class FirebaseRemoteDataSource{
+abstract class FirebaseRemoteDataSource {
   Future<bool> isSignIn();
   Future<void> signIn(UserEntity user);
   Future<void> signUp(UserEntity user);
@@ -8,4 +8,5 @@ abstract class FirebaseRemoteDataSource{
   Future<String> getCurrentUId();
   Future<void> getCreateCurrentUser(UserEntity user);
   Future<void> forgotPassword(String emailOrUsername);
+  Future<Map<String, dynamic>> getUserProfile(String uid);
 }

@@ -75,6 +75,16 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
 
     await auth.sendPasswordResetEmail(email: email);
   }
+
+  @override
+  Future<Map<String, dynamic>> getUserProfile(String uid) async {
+    final doc = await firestore.collection("Users").doc(uid).get();
+    if (doc.exists) {
+      return doc.data()!;
+    } else {
+      throw Exception("User profile not found.");
+    }
+  }
 }
 
 Future<String> _getEmailFromUsername(

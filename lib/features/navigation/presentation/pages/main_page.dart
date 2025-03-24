@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tv_app/features/series/presentation/pages/series_page.dart';
 import 'package:tv_app/features/navigation/presentation/bloc/navigation_bloc.dart';
 
+import '../../../series/presentation/bloc/series_bloc.dart';
 import '../../../series/presentation/widgets/show_exit_dialog.dart';
 
 class MainPage extends StatelessWidget {
@@ -14,7 +15,10 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<Widget> _pages = [
-      SeriesPage(uid: firebaseUser!.uid),
+      BlocProvider.value(
+        value: BlocProvider.of<SeriesBloc>(context),
+        child: SeriesPage(uid: firebaseUser!.uid),
+      ),
       Container(color: Colors.green),
       Container(color: Colors.blue),
     ];

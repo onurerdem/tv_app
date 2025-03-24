@@ -1,6 +1,9 @@
+import 'package:dartz/dartz.dart';
+
+import '../../../../core/error/failures.dart';
 import '../entities/user_entity.dart';
 
-abstract class FirebaseRepository{
+abstract class FirebaseRepository {
   Future<bool> isSignIn();
   Future<void> signIn(UserEntity user);
   Future<void> signUp(UserEntity user);
@@ -8,4 +11,5 @@ abstract class FirebaseRepository{
   Future<String> getCurrentUId();
   Future<void> getCreateCurrentUser(UserEntity user);
   Future<void> forgotPassword(String emailOrUsername);
+  Future<Either<Failure, UserEntity>> getUserProfile();
 }

@@ -67,11 +67,15 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               const SizedBox(height: 20),
               TextField(
                 controller: _emailOrUsernameController,
-                decoration: InputDecoration(
+                cursorColor: Colors.black,
+                decoration: const InputDecoration(
                   filled: true,
-                  fillColor: Colors.black.withValues(alpha: 0.1),
-                  hintText: 'Email or username.',
-                  border: const OutlineInputBorder(),
+                  fillColor: Colors.white,
+                  labelText: 'Email or username.',
+                  border: OutlineInputBorder(),
+                  floatingLabelStyle: TextStyle(
+                    color: Colors.black,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

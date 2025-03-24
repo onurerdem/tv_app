@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_up_page.dart';
 
+import '../../../navigation/presentation/bloc/navigation_bloc.dart';
 import '../../../navigation/presentation/pages/main_page.dart';
 import '../../../series/presentation/widgets/show_exit_dialog.dart';
 import '../../domain/entities/user_entity.dart';
@@ -52,7 +53,10 @@ class _SignInPageState extends State<SignInPage> {
               return BlocBuilder<AuthenticationCubit, AuthenticationState>(
                   builder: (context, authenticationState) {
                 if (authenticationState is Authenticated) {
-                  return MainPage();
+                  return BlocProvider.value(
+                    value: BlocProvider.of<NavigationBloc>(context),
+                    child: MainPage(),
+                  );
                 } else {
                   return _bodyWidget();
                 }

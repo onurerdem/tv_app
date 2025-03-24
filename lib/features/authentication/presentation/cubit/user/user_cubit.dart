@@ -77,7 +77,7 @@ class UserCubit extends Cubit<UserState> {
         isTheUsernameAvailableValue = await isTheUsernameAvailable(emailOrUsername);
         if (!isTheUsernameAvailableValue) {
           emit(
-            ForgotPasswordFailure(errorMessage: "Username not found."),
+            const ForgotPasswordFailure(errorMessage: "Username not found."),
           );
           return;
         }
@@ -85,7 +85,7 @@ class UserCubit extends Cubit<UserState> {
         isTheEmailRegisteredValue = await isTheEmailRegistered(emailOrUsername);
         if (!isTheEmailRegisteredValue) {
           emit(
-            ForgotPasswordFailure(errorMessage: "E-mail not found."),
+            const ForgotPasswordFailure(errorMessage: "E-mail not found."),
           );
           return;
         }
@@ -94,17 +94,18 @@ class UserCubit extends Cubit<UserState> {
       await forgotPasswordUseCase.call(emailOrUsername);
       emit(ForgotPasswordSuccess());
     } on SocketException catch (_) {
-      emit(ForgotPasswordFailure());
+      emit(const ForgotPasswordFailure());
     } on FirebaseAuthException catch (_) {
       if (_.code == 'user-not-found') {
         emit(
-          ForgotPasswordFailure(errorMessage: "Username or e-mail not found."),
+          const ForgotPasswordFailure(
+              errorMessage: "Username or e-mail not found."),
         );
       } else {
-        emit(ForgotPasswordFailure());
+        emit(const ForgotPasswordFailure());
       }
     } catch (_) {
-      emit(ForgotPasswordFailure());
+      emit(const ForgotPasswordFailure());
     }
   }
 }

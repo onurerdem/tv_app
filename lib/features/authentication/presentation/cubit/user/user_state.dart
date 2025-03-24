@@ -47,7 +47,7 @@ class ForgotPasswordSuccess extends UserState {
 class ForgotPasswordFailure extends UserState {
   final String? errorMessage;
 
-  ForgotPasswordFailure({this.errorMessage});
+  const ForgotPasswordFailure({this.errorMessage});
 
   @override
   List<Object> get props => [errorMessage ?? ""];
