@@ -7,7 +7,7 @@ import 'package:tv_app/core/usecase/usecase.dart';
 class GetUserProfileUseCase implements UseCase<UserEntity, NoParams> {
   final FirebaseRepository repository;
 
-  GetUserProfileUseCase(this.repository);
+  GetUserProfileUseCase({required this.repository});
 
   @override
   Future<Either<Failure, UserEntity>> call(NoParams params) async {

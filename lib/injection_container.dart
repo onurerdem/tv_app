@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:tv_app/core/utils/constants.dart';
+import 'package:tv_app/features/authentication/domain/usacases/get_user_profile_usecase.dart';
 import 'package:tv_app/features/series/data/datasources/remote/series_remote_data_source_impl.dart';
 import 'package:tv_app/features/series/domain/usecases/get_all_series.dart';
 import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
@@ -18,6 +19,7 @@ import 'features/authentication/domain/usacases/is_sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_out_usecase.dart';
 import 'features/authentication/domain/usacases/sign_up_usecase.dart';
+import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
@@ -31,61 +33,89 @@ import 'features/series/presentation/bloc/series_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerLazySingleton(() {
-    final dio = Dio();
-    dio.options.baseUrl = BASE_URL;
-    return dio;
-  });
+  sl.registerLazySingleton(
+    () {
+      final dio = Dio();
+      dio.options.baseUrl = BASE_URL;
+      return dio;
+    },
+  );
 
   sl.registerLazySingleton(() => ApiClient(sl<Dio>()));
 
   sl.registerLazySingleton<SeriesRemoteDataSource>(
-      () => SeriesRemoteDataSourceImpl(sl<ApiClient>()));
+    () => SeriesRemoteDataSourceImpl(sl<ApiClient>()),
+  );
 
   sl.registerLazySingleton<SeriesRepository>(
-      () => SeriesRepositoryImpl(sl<SeriesRemoteDataSource>()));
+    () => SeriesRepositoryImpl(sl<SeriesRemoteDataSource>()),
+  );
 
-  sl.registerLazySingleton(() => SearchSeries(sl<SeriesRepository>()));
+  sl.registerLazySingleton(
+    () => SearchSeries(sl<SeriesRepository>()),
+  );
 
-  sl.registerLazySingleton(() => GetAllSeries(sl<SeriesRepository>()));
+  sl.registerLazySingleton(
+    () => GetAllSeries(sl<SeriesRepository>()),
+  );
 
-  sl.registerLazySingleton(() => GetSerieDetails(sl<SeriesRepository>()));
+  sl.registerLazySingleton(
+    () => GetSerieDetails(sl<SeriesRepository>()),
+  );
 
-  sl.registerFactory(() => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()));
+  sl.registerFactory(
+    () => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()),
+  );
 
-  sl.registerFactory(() => SerieDetailsBloc(sl<GetSerieDetails>()));
+  sl.registerFactory(
+    () => SerieDetailsBloc(sl<GetSerieDetails>()),
+  );
 
-  sl.registerFactory<AuthenticationCubit>(() => AuthenticationCubit(
+  sl.registerFactory<AuthenticationCubit>(
+    () => AuthenticationCubit(
       isSignInUseCase: sl.call(),
       signOutUseCase: sl.call(),
-      getCurrentUidUseCase: sl.call()));
-  sl.registerFactory<UserCubit>(() => UserCubit(
-        getCreateCurrentUserUseCase: sl.call(),
-        signInUseCase: sl.call(),
-        signUpUseCase: sl.call(),
-        forgotPasswordUseCase: sl.call(),
-      ));
+      getCurrentUidUseCase: sl.call(),
+    ),
+  );
+  sl.registerFactory<UserCubit>(
+    () => UserCubit(
+      getCreateCurrentUserUseCase: sl.call(),
+      signInUseCase: sl.call(),
+      signUpUseCase: sl.call(),
+      forgotPasswordUseCase: sl.call(),
+    ),
+  );
 
   sl.registerLazySingleton<GetCreateCurrentUserUsecase>(
-      () => GetCreateCurrentUserUsecase(repository: sl.call()));
+    () => GetCreateCurrentUserUsecase(repository: sl.call()),
+  );
   sl.registerLazySingleton<GetCurrentUidUseCase>(
-      () => GetCurrentUidUseCase(repository: sl.call()));
+    () => GetCurrentUidUseCase(repository: sl.call()),
+  );
   sl.registerLazySingleton<IsSignInUseCase>(
-      () => IsSignInUseCase(repository: sl.call()));
+    () => IsSignInUseCase(repository: sl.call()),
+  );
   sl.registerLazySingleton<SignInUseCase>(
-      () => SignInUseCase(repository: sl.call()));
+    () => SignInUseCase(repository: sl.call()),
+  );
   sl.registerLazySingleton<SignOutUseCase>(
-      () => SignOutUseCase(repository: sl.call()));
+    () => SignOutUseCase(repository: sl.call()),
+  );
   sl.registerLazySingleton<SignUpUseCase>(
-      () => SignUpUseCase(repository: sl.call()));
+    () => SignUpUseCase(repository: sl.call()),
+  );
   sl.registerLazySingleton<ForgotPasswordUseCase>(
-      () => ForgotPasswordUseCase(repository: sl.call()));
+    () => ForgotPasswordUseCase(repository: sl.call()),
+  );
 
   sl.registerLazySingleton<FirebaseRepository>(
-      () => FirebaseRepositoryImpl(remoteDataSource: sl.call()));
+    () => FirebaseRepositoryImpl(remoteDataSource: sl.call()),
+  );
 
-  sl.registerLazySingleton<FirebaseRemoteDataSource>(() =>
-      FirebaseRemoteDataSourceImpl(auth: sl.call(), firestore: sl.call()));
+  sl.registerLazySingleton<FirebaseRemoteDataSource>(
+    () => FirebaseRemoteDataSourceImpl(auth: sl.call(), firestore: sl.call()),
+  );
 
   final auth = FirebaseAuth.instance;
   final fireStore = FirebaseFirestore.instance;
@@ -94,4 +124,12 @@ Future<void> init() async {
   sl.registerLazySingleton(() => fireStore);
 
   sl.registerFactory(() => NavigationBloc());
+
+  sl.registerLazySingleton<GetUserProfileUseCase>(
+    () => GetUserProfileUseCase(repository: sl.call()),
+  );
+
+  sl.registerFactory(
+        () => ProfileBloc(sl<GetUserProfileUseCase>()),
+  );
 }
