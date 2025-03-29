@@ -6,7 +6,7 @@ import '../bloc/serie_details_state.dart';
 class SerieDetailPage extends StatelessWidget {
   final int serieId;
 
-  const SerieDetailPage({Key? key, required this.serieId}) : super(key: key);
+  const SerieDetailPage({super.key, required this.serieId});
 
   @override
   Widget build(BuildContext context) {

@@ -8,10 +8,10 @@ import '../bloc/serie_details_event.dart';
 import '../bloc/series_bloc.dart';
 import '../bloc/series_event.dart';
 import '../bloc/series_state.dart';
-import '../widgets/show_exit_dialog.dart';
 
 class SeriesPage extends StatefulWidget {
-  const SeriesPage({super.key});
+  final String uid;
+  const SeriesPage({super.key, required this.uid});
 
   @override
   State<SeriesPage> createState() => _SeriesPageState();
@@ -44,8 +44,6 @@ class _SeriesPageState extends State<SeriesPage> {
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) {
           return;
-        } else if (!didPop) {
-          showExitDialog(context);
         }
       },
       child: Scaffold(
@@ -105,8 +103,8 @@ class _SeriesPageState extends State<SeriesPage> {
                                   MaterialPageRoute(
                                     builder: (_) => BlocProvider(
                                       create: (context) => SerieDetailsBloc(
-                                          di<GetSerieDetails>())
-                                        ..add(GetSerieDetailsEvent(series.id)),
+                                        di<GetSerieDetails>(),
+                                      )..add(GetSerieDetailsEvent(series.id)),
                                       child: SerieDetailPage(serieId: series.id),
                                     ),
                                   ),
@@ -165,7 +163,8 @@ class _SeriesPageState extends State<SeriesPage> {
                         return Center(child: Text(state.message));
                       }
                       return const Center(
-                          child: Text("Enter a term to search for a serie."));
+                        child: Text("Enter a term to search for a serie."),
+                      );
                     },
                   ),
                 ),
