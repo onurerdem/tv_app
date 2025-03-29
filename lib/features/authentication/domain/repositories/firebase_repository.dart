@@ -12,4 +12,6 @@ abstract class FirebaseRepository {
   Future<void> getCreateCurrentUser(UserEntity user);
   Future<void> forgotPassword(String emailOrUsername);
   Future<Either<Failure, UserEntity>> getUserProfile();
+  Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity user);
+  Future<Either<Failure, void>> changePassword(String oldPassword, String newPassword);
 }

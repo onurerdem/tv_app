@@ -9,7 +9,7 @@ class UserEntity extends Equatable {
   final String? password;
 
   const UserEntity({
-    this.name,
+    this.name = "Empty",
     this.username,
     this.email,
     this.uid,

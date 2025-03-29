@@ -11,7 +11,7 @@ import '../bloc/series_state.dart';
 
 class SeriesPage extends StatefulWidget {
   final String uid;
-  const SeriesPage({super.key,required this.uid});
+  const SeriesPage({super.key, required this.uid});
 
   @override
   State<SeriesPage> createState() => _SeriesPageState();
@@ -103,8 +103,8 @@ class _SeriesPageState extends State<SeriesPage> {
                                   MaterialPageRoute(
                                     builder: (_) => BlocProvider(
                                       create: (context) => SerieDetailsBloc(
-                                          di<GetSerieDetails>())
-                                        ..add(GetSerieDetailsEvent(series.id)),
+                                        di<GetSerieDetails>(),
+                                      )..add(GetSerieDetailsEvent(series.id)),
                                       child: SerieDetailPage(serieId: series.id),
                                     ),
                                   ),
@@ -163,7 +163,8 @@ class _SeriesPageState extends State<SeriesPage> {
                         return Center(child: Text(state.message));
                       }
                       return const Center(
-                          child: Text("Enter a term to search for a serie."));
+                        child: Text("Enter a term to search for a serie."),
+                      );
                     },
                   ),
                 ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tv_app/features/authentication/presentation/bloc/profile_bloc.dart';
+import 'package:tv_app/features/authentication/presentation/pages/profile_page.dart';
 import 'package:tv_app/features/series/presentation/pages/series_page.dart';
 import 'package:tv_app/features/navigation/presentation/bloc/navigation_bloc.dart';
 
@@ -20,7 +22,10 @@ class MainPage extends StatelessWidget {
         child: SeriesPage(uid: firebaseUser!.uid),
       ),
       Container(color: Colors.green),
-      Container(color: Colors.blue),
+      BlocProvider.value(
+        value: BlocProvider.of<ProfileBloc>(context),
+        child: const ProfilePage(),
+      ),
     ];
 
     return BlocBuilder<NavigationBloc, NavigationState>(

@@ -51,4 +51,21 @@ class FirebaseRepositoryImpl extends FirebaseRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity user) async =>
+      remoteDataSource.updateUserProfile(user);
+
+  @override
+  Future<Either<Failure, void>> changePassword(String oldPassword, String newPassword) async {
+    try {
+      await remoteDataSource.changePassword(oldPassword, newPassword);
+      return const Right(null);
+    } catch (e) {
+      if (e is OldPasswordWrongFailure) {
+        return Left(OldPasswordWrongFailure());
+      }
+      return Left(ServerFailure());
+    }
+  }
 }

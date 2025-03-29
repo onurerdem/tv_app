@@ -20,14 +20,19 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
+
+  bool _isPasswordObscured = true;
+  bool _isConfirmPasswordObscured = true;
 
   @override
   void dispose() {
     _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -66,15 +71,13 @@ class _SignUpPageState extends State<SignUpPage> {
           }
           if (userState is UserEmailAlreadyExists) {
             snackBarError(
-              msg:
-                  "This email address is already registered.\nPlease use a different email address.",
+              msg: "This email address is already registered.\nPlease use a different email address.",
               scaffoldState: _globalKey,
             );
           }
           if (userState is UserUsernameAlreadyExists) {
             snackBarError(
-              msg:
-                  "This username is already taken.\nPlease choose a different username.",
+              msg: "This username is already taken.\nPlease choose a different username.",
               scaffoldState: _globalKey,
             );
           }
@@ -161,14 +164,59 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.all(Radius.circular(24)),
                 ),
                 child: TextField(
-                  obscureText: true,
+                  obscureText: _isPasswordObscured,
                   controller: _passwordController,
                   cursorColor: Colors.black,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Enter your password.',
                     border: InputBorder.none,
-                    floatingLabelStyle: TextStyle(
+                    floatingLabelStyle: const TextStyle(
                       color: Colors.black,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordObscured ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey.shade600,
+                      ),
+                      tooltip: _isPasswordObscured ? 'Show password' : 'Hide password',
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordObscured = !_isPasswordObscured;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Container(
+                height: 52,
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(24)),
+                ),
+                child: TextField(
+                  obscureText: _isConfirmPasswordObscured,
+                  controller: _confirmPasswordController,
+                  cursorColor: Colors.black,
+                  decoration: InputDecoration(
+                    labelText: 'Enter your password again.',
+                    border: InputBorder.none,
+                    floatingLabelStyle: const TextStyle(
+                      color: Colors.black,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isConfirmPasswordObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        color: Colors.grey.shade600,
+                      ),
+                      tooltip: _isConfirmPasswordObscured ? 'Show password' : 'Hide password',
+                      onPressed: () {
+                        setState(() {
+                          _isConfirmPasswordObscured = !_isConfirmPasswordObscured;
+                        });
+                      },
                     ),
                   ),
                 ),
@@ -250,11 +298,24 @@ class _SignUpPageState extends State<SignUpPage> {
         msg: "The password is empty!",
         scaffoldState: _globalKey,
       );
-    } else if (_passwordController.text.length < 3 ||
-        _passwordController.text.length > 15) {
+    } else if (_passwordController.text.length < 6 || _passwordController.text.length > 15) {
       snackBarError(
-        msg:
-            "Your password can not have less than\n3 characters or more than 15 characters!",
+        msg: "Your password can not have less than\n6 characters or more than 15 characters!",
+        scaffoldState: _globalKey,
+      );
+    } else if (_confirmPasswordController.text.isEmpty) {
+      snackBarError(
+        msg: "The password repeat field is empty!",
+        scaffoldState: _globalKey,
+      );
+    } else if (_confirmPasswordController.text.length < 6 || _confirmPasswordController.text.length > 15) {
+      snackBarError(
+        msg: "Password repetition cannot be less than\n6 characters or more than 15 characters!",
+        scaffoldState: _globalKey,
+      );
+    } else if (_passwordController.text != _confirmPasswordController.text) {
+      snackBarError(
+        msg: "Passwords do not match.",
         scaffoldState: _globalKey,
       );
     } else {

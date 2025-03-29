@@ -27,6 +27,8 @@ class _SignInPageState extends State<SignInPage> {
   final GlobalKey<ScaffoldState> _scaffoldGlobalKey =
       GlobalKey<ScaffoldState>();
 
+  bool _isPasswordObscured = true;
+
   @override
   void dispose() {
     _usernameOrEmailController.dispose();
@@ -127,12 +129,24 @@ class _SignInPageState extends State<SignInPage> {
                 child: TextField(
                   controller: _passwordController,
                   cursorColor: Colors.black,
-                  obscureText: true,
-                  decoration: const InputDecoration(
+                  obscureText: _isPasswordObscured,
+                  decoration: InputDecoration(
                     labelText: 'Enter your password.',
                     border: InputBorder.none,
-                    floatingLabelStyle: TextStyle(
+                    floatingLabelStyle: const TextStyle(
                       color: Colors.black,
+                    ),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isPasswordObscured ? Icons.visibility : Icons.visibility_off,
+                        color: Colors.grey.shade600,
+                      ),
+                      tooltip: _isPasswordObscured ? 'Show password' : 'Hide password',
+                      onPressed: () {
+                        setState(() {
+                          _isPasswordObscured = !_isPasswordObscured;
+                        });
+                      },
                     ),
                   ),
                 ),

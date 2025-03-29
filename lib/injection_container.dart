@@ -12,6 +12,7 @@ import 'features/authentication/data/datasources/firebase_remote_data_source.dar
 import 'features/authentication/data/datasources/remote/firebase_remote_data_source_impl.dart';
 import 'features/authentication/data/repositories/firebase_repository_impl.dart';
 import 'features/authentication/domain/repositories/firebase_repository.dart';
+import 'features/authentication/domain/usacases/change_password_use_case.dart';
 import 'features/authentication/domain/usacases/forgot_password_usecase.dart';
 import 'features/authentication/domain/usacases/get_create_current_user_usecase.dart';
 import 'features/authentication/domain/usacases/get_current_uid_usecase.dart';
@@ -19,6 +20,7 @@ import 'features/authentication/domain/usacases/is_sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_in_usecase.dart';
 import 'features/authentication/domain/usacases/sign_out_usecase.dart';
 import 'features/authentication/domain/usacases/sign_up_usecase.dart';
+import 'features/authentication/domain/usacases/update_user_profile_usecase.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
@@ -129,7 +131,19 @@ Future<void> init() async {
     () => GetUserProfileUseCase(repository: sl.call()),
   );
 
+  sl.registerLazySingleton<UpdateUserProfileUseCase>(
+    () => UpdateUserProfileUseCase(repository: sl.call()),
+  );
+
+  sl.registerLazySingleton<ChangePasswordUseCase>(
+    () => ChangePasswordUseCase(repository: sl.call()),
+  );
+
   sl.registerFactory(
-        () => ProfileBloc(sl<GetUserProfileUseCase>()),
+    () => ProfileBloc(
+      sl<GetUserProfileUseCase>(),
+      sl<UpdateUserProfileUseCase>(),
+      sl<ChangePasswordUseCase>(),
+    ),
   );
 }

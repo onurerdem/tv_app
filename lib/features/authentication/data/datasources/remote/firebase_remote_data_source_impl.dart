@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../../../core/error/failures.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../models/user_model.dart';
 import '../firebase_remote_data_source.dart';
@@ -83,6 +85,53 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
       return doc.data()!;
     } else {
       throw Exception("User profile not found.");
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity user) async {
+    try {
+      final uid = await getCurrentUId();
+      final userCollection = firestore.collection("Users");
+      final updatedData = UserModel(
+        uid: uid,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        status: user.status,
+      ).toDocument();
+      await userCollection.doc(uid).update(updatedData);
+      final updatedDoc = await userCollection.doc(uid).get();
+      return Right(UserModel.fromSnapshot(updatedDoc));
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    final user = auth.currentUser;
+    if (user == null) {
+      throw Exception("No user signed in!");
+    }
+
+    final credential = EmailAuthProvider.credential(
+      email: user.email!,
+      password: oldPassword,
+    );
+
+    try {
+      await user.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword);
+    } on FirebaseAuthException catch (e) {
+      debugPrint("FirebaseAuthException caught: code=${e.code}, message=${e.message}");
+      if (e.code == "wrong-password" || e.code == "invalid-credential") {
+        throw OldPasswordWrongFailure();
+      } else if (e.code == "weak-password") {
+        throw Exception("Password should be at least 6 characters.");
+      } else {
+        throw Exception("Failed to update password.");
+      }
     }
   }
 }

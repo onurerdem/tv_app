@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/series/presentation/pages/splash_screen.dart';
+import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'features/series/domain/usecases/get_serie_details.dart';
@@ -43,6 +44,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<NavigationBloc>(
           create: (_) => di.sl<NavigationBloc>(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (_) => di.sl<ProfileBloc>(),
         ),
       ],
       child: MaterialApp(

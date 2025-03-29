@@ -26,3 +26,35 @@ class ProfileError extends ProfileState {
   @override
   List<Object?> get props => [message];
 }
+
+class ProfileUpdating extends ProfileState {}
+
+class ProfileUpdateSuccess extends ProfileState {
+  final UserEntity user;
+  const ProfileUpdateSuccess(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class ProfileUpdateError extends ProfileState {
+  final String message;
+  const ProfileUpdateError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class ChangingPassword extends ProfileState {}
+
+class ChangePasswordSuccess extends ProfileState {
+  const ChangePasswordSuccess();
+}
+
+class ChangePasswordError extends ProfileState {
+  final String message;
+  const ChangePasswordError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
