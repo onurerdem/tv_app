@@ -76,9 +76,9 @@ class SerieDetailPage extends StatelessWidget {
                     Text(
                       state.serieDetails.premiered != null &&
                               state.serieDetails.ended != null
-                          ? "${state.serieDetails.premiered} - ${state.serieDetails.ended}"
+                          ? "${state.serieDetails.premiered!.replaceAll('-', '.')} - ${state.serieDetails.ended!.replaceAll('-', '.')}"
                           : (state.serieDetails.premiered != null
-                              ? "${state.serieDetails.premiered} - Ongoing"
+                              ? "${state.serieDetails.premiered!.replaceAll('-', '.')} - Ongoing"
                               : "Premiered date not available."),
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
