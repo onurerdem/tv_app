@@ -30,17 +30,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.7.0
-  flutter_bloc: ^8.1.6
-  get_it: ^8.0.2
+  dio: ^5.8.0+1
+  flutter_bloc: ^9.1.0
+  get_it: ^8.0.3
   dartz: ^0.10.1
-  equatable: ^2.0.0
-  lottie: ^3.2.0
-  shared_preferences: ^2.3.5
+  equatable: ^2.0.7
+  lottie: ^3.3.1
+  shared_preferences: ^2.5.3
   flutter_svg: ^2.0.17
-  firebase_core: ^3.10.1
-  firebase_auth: ^5.4.1
-  cloud_firestore: ^5.6.2
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cloud_firestore: ^5.6.6
   font_awesome_flutter: ^10.8.0
 
   # The following adds the Cupertino Icons font to your application.
@@ -56,7 +56,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^4.0.0
+  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

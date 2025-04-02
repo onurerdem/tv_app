@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_state.dart';
 
@@ -33,11 +34,19 @@ class SerieDetailPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(16.0),
                               child: Image.network(
                                 state.serieDetails.imageUrl!,
+                                width: MediaQuery.of(context).size.width / 2,
                                 fit: BoxFit.cover,
                               ),
                             ),
                           )
-                        : const SizedBox.shrink(),
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(16.0),
+                            child: SvgPicture.asset(
+                              "assets/images/No-Image-Placeholder.svg",
+                              width: MediaQuery.of(context).size.width / 2,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                     const SizedBox(height: 16),
                     Text(
                       state.serieDetails.name,

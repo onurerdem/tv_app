@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tv_app/features/series/presentation/pages/serie_detail_page.dart';
 import '../../domain/usecases/get_serie_details.dart';
@@ -116,14 +117,21 @@ class _SeriesPageState extends State<SeriesPage> {
                                     height: 160,
                                     child: series.imageUrl != null
                                         ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
+                                            borderRadius: BorderRadius.circular(16.0),
                                             child: Image.network(
                                               series.imageUrl!,
+                                              width: MediaQuery.of(context).size.width / 3.9,
                                               fit: BoxFit.cover,
                                             ),
                                           )
-                                        : null,
+                                        : ClipRRect(
+                                            borderRadius: BorderRadius.circular(16.0),
+                                            child: SvgPicture.asset(
+                                              "assets/images/No-Image-Placeholder.svg",
+                                              width: MediaQuery.of(context).size.width / 3.9,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
