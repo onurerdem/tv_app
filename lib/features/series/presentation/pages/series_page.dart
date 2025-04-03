@@ -36,7 +36,7 @@ class _SeriesPageState extends State<SeriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
     final bloc = context.read<SeriesBloc>();
     final di = GetIt.instance;
 
@@ -56,7 +56,7 @@ class _SeriesPageState extends State<SeriesPage> {
             child: Column(
               children: [
                 TextField(
-                  controller: _controller,
+                  controller: controller,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     labelText: 'Search for series.',
@@ -67,7 +67,7 @@ class _SeriesPageState extends State<SeriesPage> {
                       icon: const Icon(Icons.search),
                       onPressed: () {
                         bloc.add(
-                          SearchSeriesQuery(_controller.text.trim()),
+                          SearchSeriesQuery(controller.text.trim()),
                         );
                         FocusScope.of(context).unfocus();
                       },

@@ -8,6 +8,12 @@ import 'package:tv_app/features/series/data/datasources/remote/series_remote_dat
 import 'package:tv_app/features/series/domain/usecases/get_all_series.dart';
 import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
+import 'features/actors/data/datasources/actors_remote_data_source.dart';
+import 'features/actors/data/datasources/remote/actors_remote_data_source_impl.dart';
+import 'features/actors/data/repositories/actors_repository_impl.dart';
+import 'features/actors/domain/repositories/actors_repository.dart';
+import 'features/actors/domain/usecases/get_all_actors.dart';
+import 'features/actors/domain/usecases/search_actors.dart';
 import 'features/authentication/data/datasources/firebase_remote_data_source.dart';
 import 'features/authentication/data/datasources/remote/firebase_remote_data_source_impl.dart';
 import 'features/authentication/data/repositories/firebase_repository_impl.dart';
@@ -146,4 +152,13 @@ Future<void> init() async {
       sl<ChangePasswordUseCase>(),
     ),
   );
+
+  sl.registerLazySingleton<ActorsRemoteDataSource>(
+    () => ActorsRemoteDataSourceImpl(sl<ApiClient>()),
+  );
+  sl.registerLazySingleton<ActorsRepository>(
+    () => ActorsRepositoryImpl(sl<ActorsRemoteDataSource>()),
+  );
+  sl.registerLazySingleton(() => GetAllActors(sl<ActorsRepository>()));
+  sl.registerLazySingleton(() => SearchActors(sl<ActorsRepository>()));
 }

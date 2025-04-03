@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -40,8 +41,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBWM7VZRz5wdtcyHR00BtQ4L87dWo0qCTY',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_WEB_WINDOWS_API_KEY']!,
     appId: '1:95103168259:web:493d0a37e58e65a4d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',
@@ -50,16 +51,16 @@ class DefaultFirebaseOptions {
     measurementId: 'G-L9M455S78D',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyD3NUOrgv2tyWBWb5J0F4sjHOohbXi5xzo',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
     appId: '1:95103168259:android:db96b00233de7bf6d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',
     storageBucket: 'tvapp-1caf5.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDtucQHNvnDAzzzCiqWAPkgA0LxKuNrsZQ',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_IOS_MACOS_API_KEY']!,
     appId: '1:95103168259:ios:3afedbffc7be9b33d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',
@@ -67,8 +68,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.onurerdem.tvApp',
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDtucQHNvnDAzzzCiqWAPkgA0LxKuNrsZQ',
+  static FirebaseOptions macos = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_IOS_MACOS_API_KEY']!,
     appId: '1:95103168259:ios:3afedbffc7be9b33d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',
@@ -76,8 +77,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.onurerdem.tvApp',
   );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyBWM7VZRz5wdtcyHR00BtQ4L87dWo0qCTY',
+  static FirebaseOptions windows = FirebaseOptions(
+    apiKey: dotenv.env['FIREBASE_WEB_WINDOWS_API_KEY']!,
     appId: '1:95103168259:web:ee84d961a3cdd0a7d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',

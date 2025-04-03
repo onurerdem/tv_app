@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/series/presentation/pages/splash_screen.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
@@ -14,6 +15,7 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

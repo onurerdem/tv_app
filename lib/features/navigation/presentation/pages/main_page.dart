@@ -16,7 +16,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages = [
+    final List<Widget> pages = [
       BlocProvider.value(
         value: BlocProvider.of<SeriesBloc>(context),
         child: SeriesPage(uid: firebaseUser!.uid),
@@ -41,7 +41,7 @@ class MainPage extends StatelessWidget {
             }
           },
           child: Scaffold(
-            body: _pages[state.selectedIndex],
+            body: pages[state.selectedIndex],
             bottomNavigationBar: BottomNavigationBar(
               currentIndex: state.selectedIndex,
               onTap: (index) {
