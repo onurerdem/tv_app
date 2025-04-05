@@ -45,3 +45,6 @@ app.*.map.json
 
 # Android C++ build artifacts
 android/app/.cxx/
+
+# Firebase/Google Service Files
+android/app/google-services.json

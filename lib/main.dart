@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/series/presentation/pages/splash_screen.dart';
+import 'features/actors/presentation/bloc/actors_bloc.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
@@ -49,6 +50,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<ProfileBloc>(
           create: (_) => di.sl<ProfileBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<ActorsBloc>(),
         ),
       ],
       child: MaterialApp(

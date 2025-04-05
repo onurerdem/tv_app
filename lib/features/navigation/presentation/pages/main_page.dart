@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tv_app/features/actors/presentation/bloc/actors_bloc.dart';
+import 'package:tv_app/features/actors/presentation/pages/actors_page.dart';
 import 'package:tv_app/features/authentication/presentation/bloc/profile_bloc.dart';
 import 'package:tv_app/features/authentication/presentation/pages/profile_page.dart';
 import 'package:tv_app/features/series/presentation/pages/series_page.dart';
@@ -21,7 +23,10 @@ class MainPage extends StatelessWidget {
         value: BlocProvider.of<SeriesBloc>(context),
         child: SeriesPage(uid: firebaseUser!.uid),
       ),
-      Container(color: Colors.green),
+      BlocProvider.value(
+        value: BlocProvider.of<ActorsBloc>(context),
+        child: const ActorsPage(),
+      ),
       BlocProvider.value(
         value: BlocProvider.of<ProfileBloc>(context),
         child: const ProfilePage(),
