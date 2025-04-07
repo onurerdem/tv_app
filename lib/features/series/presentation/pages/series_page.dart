@@ -98,6 +98,7 @@ class _SeriesPageState extends State<SeriesPage> {
                           itemBuilder: (context, index) {
                             final series = state.seriesList[index];
                             return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 Navigator.push(
                                   context,
