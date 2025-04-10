@@ -16,6 +16,7 @@ import 'features/actors/domain/usecases/get_actor_cast_credits_usecase.dart';
 import 'features/actors/domain/usecases/get_actor_details_usecase.dart';
 import 'features/actors/domain/usecases/get_all_actors.dart';
 import 'features/actors/domain/usecases/search_actors.dart';
+import 'features/actors/presentation/bloc/actor_details_bloc.dart';
 import 'features/actors/presentation/bloc/actors_bloc.dart';
 import 'features/authentication/data/datasources/firebase_remote_data_source.dart';
 import 'features/authentication/data/datasources/remote/firebase_remote_data_source_impl.dart';
@@ -159,14 +160,27 @@ Future<void> init() async {
   sl.registerLazySingleton<ActorsRemoteDataSource>(
     () => ActorsRemoteDataSourceImpl(sl<ApiClient>()),
   );
+
   sl.registerLazySingleton<ActorsRepository>(
     () => ActorsRepositoryImpl(sl<ActorsRemoteDataSource>()),
   );
+
   sl.registerLazySingleton(() => GetAllActors(sl<ActorsRepository>()));
   sl.registerLazySingleton(() => SearchActors(sl<ActorsRepository>()));
+
   sl.registerFactory(() => ActorsBloc(sl<SearchActors>(), sl<GetAllActors>()));
+
   sl.registerLazySingleton(
-          () => GetActorDetailsUseCase(sl<ActorsRepository>()));
+    () => GetActorDetailsUseCase(sl<ActorsRepository>()),
+  );
   sl.registerLazySingleton(
-          () => GetActorCastCreditsUseCase(sl<ActorsRepository>()));
+    () => GetActorCastCreditsUseCase(sl<ActorsRepository>()),
+  );
+
+  sl.registerFactory(
+    () => ActorDetailsBloc(
+      sl<GetActorDetailsUseCase>(),
+      sl<GetActorCastCreditsUseCase>(),
+    ),
+  );
 }
