@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:tv_app/features/series/presentation/pages/serie_detail_page.dart';
+import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
 import '../../domain/usecases/get_serie_details.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_event.dart';
@@ -107,7 +107,7 @@ class _SeriesPageState extends State<SeriesPage> {
                                       create: (context) => SerieDetailsBloc(
                                         di<GetSerieDetails>(),
                                       )..add(GetSerieDetailsEvent(series.id)),
-                                      child: SerieDetailPage(serieId: series.id),
+                                      child: SerieDetailsPage(serieId: series.id),
                                     ),
                                   ),
                                 );

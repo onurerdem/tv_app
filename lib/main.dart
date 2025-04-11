@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/series/presentation/pages/splash_screen.dart';
+import 'features/actors/domain/usecases/get_actor_cast_credits_usecase.dart';
+import 'features/actors/domain/usecases/get_actor_details_usecase.dart';
+import 'features/actors/presentation/bloc/actor_details_bloc.dart';
 import 'features/actors/presentation/bloc/actors_bloc.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
@@ -53,6 +56,12 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => di.sl<ActorsBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => ActorDetailsBloc(
+            di.sl<GetActorDetailsUseCase>(),
+            di.sl<GetActorCastCreditsUseCase>(),
+          ),
         ),
       ],
       child: MaterialApp(

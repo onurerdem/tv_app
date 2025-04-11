@@ -4,10 +4,10 @@ import 'package:flutter_svg/svg.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_state.dart';
 
-class SerieDetailPage extends StatelessWidget {
+class SerieDetailsPage extends StatelessWidget {
   final int serieId;
 
-  const SerieDetailPage({super.key, required this.serieId});
+  const SerieDetailsPage({super.key, required this.serieId});
 
   @override
   Widget build(BuildContext context) {
