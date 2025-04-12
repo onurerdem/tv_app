@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:tv_app/features/series/presentation/pages/serie_detail_page.dart';
+import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
 import '../../domain/usecases/get_serie_details.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_event.dart';
@@ -35,7 +36,7 @@ class _SeriesPageState extends State<SeriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController _controller = TextEditingController();
+    final TextEditingController controller = TextEditingController();
     final bloc = context.read<SeriesBloc>();
     final di = GetIt.instance;
 
@@ -55,7 +56,7 @@ class _SeriesPageState extends State<SeriesPage> {
             child: Column(
               children: [
                 TextField(
-                  controller: _controller,
+                  controller: controller,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     labelText: 'Search for series.',
@@ -66,7 +67,7 @@ class _SeriesPageState extends State<SeriesPage> {
                       icon: const Icon(Icons.search),
                       onPressed: () {
                         bloc.add(
-                          SearchSeriesQuery(_controller.text.trim()),
+                          SearchSeriesQuery(controller.text.trim()),
                         );
                         FocusScope.of(context).unfocus();
                       },
@@ -97,6 +98,7 @@ class _SeriesPageState extends State<SeriesPage> {
                           itemBuilder: (context, index) {
                             final series = state.seriesList[index];
                             return GestureDetector(
+                              behavior: HitTestBehavior.opaque,
                               onTap: () {
                                 Navigator.push(
                                   context,
@@ -105,7 +107,7 @@ class _SeriesPageState extends State<SeriesPage> {
                                       create: (context) => SerieDetailsBloc(
                                         di<GetSerieDetails>(),
                                       )..add(GetSerieDetailsEvent(series.id)),
-                                      child: SerieDetailPage(serieId: series.id),
+                                      child: SerieDetailsPage(serieId: series.id),
                                     ),
                                   ),
                                 );
@@ -116,14 +118,21 @@ class _SeriesPageState extends State<SeriesPage> {
                                     height: 160,
                                     child: series.imageUrl != null
                                         ? ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(16.0),
+                                            borderRadius: BorderRadius.circular(16.0),
                                             child: Image.network(
                                               series.imageUrl!,
+                                              width: MediaQuery.of(context).size.width / 3.9,
                                               fit: BoxFit.cover,
                                             ),
                                           )
-                                        : null,
+                                        : ClipRRect(
+                                            borderRadius: BorderRadius.circular(16.0),
+                                            child: SvgPicture.asset(
+                                              "assets/images/No-Image-Placeholder.svg",
+                                              width: MediaQuery.of(context).size.width / 3.9,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(

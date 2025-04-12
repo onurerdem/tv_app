@@ -25,6 +25,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.env
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
@@ -41,3 +42,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android C++ build artifacts
+android/app/.cxx/
+
+# Firebase/Google Service Files
+android/app/google-services.json
