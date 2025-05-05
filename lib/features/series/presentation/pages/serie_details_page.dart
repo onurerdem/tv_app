@@ -102,8 +102,8 @@ class SerieDetailsPage extends StatelessWidget {
                       runSpacing: 10,
                       children: [
                         Text(
-                          state.serieDetails.network != null
-                              ? state.serieDetails.network!
+                          state.serieDetails.networkName != null
+                              ? state.serieDetails.networkName!
                               : "No network information available.",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
