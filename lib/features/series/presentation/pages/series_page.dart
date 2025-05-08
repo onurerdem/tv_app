@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
 import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
+import '../../domain/usecases/get_episodes.dart';
 import '../../domain/usecases/get_serie_details.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_event.dart';
@@ -106,6 +107,7 @@ class _SeriesPageState extends State<SeriesPage> {
                                     builder: (_) => BlocProvider(
                                       create: (context) => SerieDetailsBloc(
                                         di<GetSerieDetails>(),
+                                        di<GetEpisodes>(),
                                       )..add(GetSerieDetailsEvent(series.id)),
                                       child: SerieDetailsPage(serieId: series.id),
                                     ),

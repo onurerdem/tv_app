@@ -21,7 +21,7 @@ class SeriesModel extends Series {
   });
 
   factory SeriesModel.fromJson(Map<String, dynamic> json) {
-    double? _parseRating(Map<String, dynamic>? ratingData) {
+    double? parseRating(Map<String, dynamic>? ratingData) {
       if (ratingData != null) {
         final avgValue = ratingData['average'];
         if (avgValue != null && avgValue is num) {
@@ -44,7 +44,7 @@ class SeriesModel extends Series {
         officialSite: json['show']['officialSite'],
         scheduleTime: json['show']['schedule']?['time'] ?? 'Time not available.',
         scheduleDays: List<String>.from(json['show']['schedule']?['days'] ?? []),
-        ratingAverage: _parseRating(json['show']['rating'] as Map<String, dynamic>?),
+        ratingAverage: parseRating(json['show']['rating'] as Map<String, dynamic>?),
         networkName: json['show']['network']?['name'] ?? 'Network not available.',
         networkCountryName: json['show']['network']?['country']?['name'] ?? 'Country not available.',
         imageUrl: json['show']['image'] != null ? json['show']['image']['medium'] : null,
@@ -63,7 +63,7 @@ class SeriesModel extends Series {
         officialSite: json['officialSite'],
         scheduleTime: json['schedule']?['time'] ?? 'Time not available.',
         scheduleDays: List<String>.from(json['schedule']?['days'] ?? []),
-        ratingAverage: _parseRating(json['rating'] as Map<String, dynamic>?),
+        ratingAverage: parseRating(json['rating'] as Map<String, dynamic>?),
         networkName: json['network']?['name'] ?? 'Network not available.',
         networkCountryName: json['network']?['country']?['name'] ?? 'Country not available.',
         imageUrl: json['image'] != null ? json['image']['medium'] : null,

@@ -10,6 +10,7 @@ import 'features/actors/presentation/bloc/actors_bloc.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
+import 'features/series/domain/usecases/get_episodes.dart';
 import 'features/series/domain/usecases/get_serie_details.dart';
 import 'features/series/presentation/bloc/serie_details_bloc.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
@@ -40,6 +41,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (_) => SerieDetailsBloc(
             di.sl<GetSerieDetails>(),
+            di.sl<GetEpisodes>(),
           ),
         ),
         BlocProvider<AuthenticationCubit>(

@@ -38,6 +38,7 @@ import 'features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
+import 'features/series/domain/usecases/get_episodes.dart';
 import 'features/series/domain/usecases/search_series.dart';
 import 'core/network/api_client.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
@@ -75,12 +76,17 @@ Future<void> init() async {
     () => GetSerieDetails(sl<SeriesRepository>()),
   );
 
+  sl.registerLazySingleton(() => GetEpisodes(sl<SeriesRepository>()));
+
   sl.registerFactory(
     () => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()),
   );
 
   sl.registerFactory(
-    () => SerieDetailsBloc(sl<GetSerieDetails>()),
+    () => SerieDetailsBloc(
+      sl<GetSerieDetails>(),
+      sl<GetEpisodes>(),
+    ),
   );
 
   sl.registerFactory<AuthenticationCubit>(
