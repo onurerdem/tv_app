@@ -58,7 +58,7 @@ class _ActorsPageState extends State<ActorsPage> {
                   floatingLabelStyle: const TextStyle(
                     color: Colors.black,
                   ),
-                  suffixIcon: IconButton(
+                  prefixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
                       bloc.add(
@@ -67,9 +67,20 @@ class _ActorsPageState extends State<ActorsPage> {
                       FocusScope.of(context).unfocus();
                     },
                   ),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      bloc.add(
+                        SearchActorsQueryEvent(_controller.text = ""),
+                      );
+                      FocusScope.of(context).unfocus();
+                    },
+                  ),
                 ),
                 onChanged: (query) {
-                  bloc.add(SearchActorsQueryEvent(query.trim()));
+                  bloc.add(
+                    SearchActorsQueryEvent(query.trim()),
+                  );
                 },
                 textInputAction: TextInputAction.search,
                 onSubmitted: (query) {

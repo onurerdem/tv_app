@@ -21,6 +21,7 @@ class SeriesPage extends StatefulWidget {
 
 class _SeriesPageState extends State<SeriesPage> {
   late SeriesBloc bloc;
+  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
@@ -57,18 +58,27 @@ class _SeriesPageState extends State<SeriesPage> {
             child: Column(
               children: [
                 TextField(
-                  controller: controller,
+                  controller: _controller,
                   cursorColor: Colors.black,
                   decoration: InputDecoration(
                     labelText: 'Search for series.',
                     floatingLabelStyle: const TextStyle(
                       color: Colors.black,
                     ),
-                    suffixIcon: IconButton(
+                    prefixIcon: IconButton(
                       icon: const Icon(Icons.search),
                       onPressed: () {
                         bloc.add(
-                          SearchSeriesQuery(controller.text.trim()),
+                          SearchSeriesQuery(_controller.text.trim()),
+                        );
+                        FocusScope.of(context).unfocus();
+                      },
+                    ),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        bloc.add(
+                          SearchSeriesQuery(_controller.text = ""),
                         );
                         FocusScope.of(context).unfocus();
                       },
@@ -146,7 +156,12 @@ class _SeriesPageState extends State<SeriesPage> {
                                           series.name,
                                           style: const TextStyle(fontSize: 16),
                                         ),
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Rating: ${series.ratingAverage != null ? series.ratingAverage.toString() : "Rating not available."}",
+                                          style: const TextStyle(fontSize: 12),
+                                        ),
+                                        const SizedBox(height: 8),
                                         Text(
                                           series.summary != null
                                               ? "${series.summary?.replaceAll(RegExp(r'<[^>]*>'), '')}"
@@ -155,7 +170,7 @@ class _SeriesPageState extends State<SeriesPage> {
                                           maxLines: 4,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        const SizedBox(height: 10),
+                                        const SizedBox(height: 8),
                                         Text(
                                           series.genres.isNotEmpty
                                               ? series.genres.join(', ')
