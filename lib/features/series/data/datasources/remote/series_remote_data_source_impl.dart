@@ -68,4 +68,16 @@ class SeriesRemoteDataSourceImpl implements SeriesRemoteDataSource {
       throw ServerException();
     }
   }
+
+  @override
+  Future<List<SeriesModel>> getSeriesByPage(int pageNumber) async {
+    final response = await apiClient.get('$GET_SHOWS$GET_PAGE$pageNumber');
+    if (response.statusCode == 200) {
+      return (response.data as List)
+          .map((json) => SeriesModel.fromJson(json))
+          .toList();
+    } else {
+      throw ServerException();
+    }
+  }
 }

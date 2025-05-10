@@ -38,7 +38,6 @@ class _SeriesPageState extends State<SeriesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controller = TextEditingController();
     final bloc = context.read<SeriesBloc>();
     final di = GetIt.instance;
 

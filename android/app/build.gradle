@@ -51,6 +51,13 @@ android {
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ["-Xlint:deprecation"]
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+}
+
 flutter {
     source = "../.."
 }

@@ -8,5 +8,6 @@ abstract class SeriesRemoteDataSource {
   Future<List<SeriesModel>> searchSeries(String query);
   Future<SeriesModel> getSerieDetails(int serieId);
   Future<List<EpisodeModel>> fetchEpisodes(int showId);
+  Future<List<SeriesModel>> getSeriesByPage(int page);
 
 }
