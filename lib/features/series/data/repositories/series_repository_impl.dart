@@ -49,4 +49,14 @@ class SeriesRepositoryImpl implements SeriesRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, List<Series>>> getSeriesByPage(int pageNumber) async {
+    try {
+      final series = await remoteDataSource.getSeriesByPage(pageNumber);
+      return Right(series);
+    } catch (_) {
+      return Left(ServerFailure());
+    }
+  }
 }
