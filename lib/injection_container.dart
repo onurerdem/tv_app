@@ -82,7 +82,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetSeriesByPage(sl<SeriesRepository>()));
 
   sl.registerFactory(
-    () => SeriesBloc(sl<SearchSeries>(), sl<GetAllSeries>()),
+    () => SeriesBloc(
+      sl<SearchSeries>(),
+      sl<GetAllSeries>(),
+      sl<GetSeriesByPage>(),
+    ),
   );
 
   sl.registerFactory(

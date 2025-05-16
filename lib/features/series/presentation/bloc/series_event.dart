@@ -15,3 +15,5 @@ class SearchSeriesQuery extends SeriesEvent {
   @override
   List<Object> get props => [query];
 }
+
+class FetchSeriesEvent extends SeriesEvent {}
