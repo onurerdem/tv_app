@@ -134,7 +134,8 @@ class SerieDetailsPage extends StatelessWidget {
                                       fit: BoxFit.cover,
                                       placeholder: (context, url) => Container(
                                         width:
-                                            MediaQuery.of(context).size.width / 2,
+                                            MediaQuery.of(context).size.width /
+                                                2,
                                         height: 200,
                                         color: Colors.grey[300],
                                         child: Center(
@@ -151,7 +152,8 @@ class SerieDetailsPage extends StatelessWidget {
                                           "assets/images/No-Image-Placeholder.svg",
                                           width: MediaQuery.of(context)
                                                   .size
-                                                  .width / 2,
+                                                  .width /
+                                              2,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -261,7 +263,8 @@ class SerieDetailsPage extends StatelessWidget {
                                   state.serieDetails.officialSite!.isNotEmpty)
                                 InkWell(
                                   onTap: () => _launchURL(
-                                      context, state.serieDetails.officialSite,
+                                    context,
+                                    state.serieDetails.officialSite,
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -324,7 +327,12 @@ class SerieDetailsPage extends StatelessWidget {
                                           ?.color),
                                   const SizedBox(width: 4),
                                   Text(
-                                    state.serieDetails.scheduleDays.join(', '),
+                                    state.serieDetails.scheduleDays != [] &&
+                                            state.serieDetails.scheduleDays
+                                                .isNotEmpty
+                                        ? state.serieDetails.scheduleDays
+                                            .join(', ')
+                                        : "No schedule days information available.",
                                     style:
                                         Theme.of(context).textTheme.bodyMedium,
                                   ),
@@ -342,7 +350,9 @@ class SerieDetailsPage extends StatelessWidget {
                                   const SizedBox(width: 4),
                                   Text(
                                     state.serieDetails.scheduleTime?.trim() !=
-                                            null
+                                                null &&
+                                            state.serieDetails.scheduleTime!
+                                                .isNotEmpty
                                         ? state.serieDetails.scheduleTime!
                                         : "No time information available.",
                                     style:

@@ -22,18 +22,27 @@ class SeriesPage extends StatefulWidget {
 class _SeriesPageState extends State<SeriesPage> {
   late SeriesBloc bloc;
   final TextEditingController _controller = TextEditingController();
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     bloc = context.read<SeriesBloc>();
-    bloc.add(GetAllSeriesEvent());
+    bloc.add(FetchSeriesEvent());
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _refreshData() async {
     bloc = context.read<SeriesBloc>();
     bloc.add(GetAllSeriesEvent());
     FocusScope.of(context).unfocus();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent) {
+      bloc.add(FetchSeriesEvent());
+    }
   }
 
   @override
@@ -95,7 +104,7 @@ class _SeriesPageState extends State<SeriesPage> {
                     );
                   },
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Expanded(
                   child: BlocBuilder<SeriesBloc, SeriesState>(
                     builder: (context, state) {
@@ -103,9 +112,17 @@ class _SeriesPageState extends State<SeriesPage> {
                         return const Center(child: CircularProgressIndicator());
                       } else if (state is SeriesLoaded) {
                         return ListView.separated(
+                          controller: _scrollController,
                           separatorBuilder: (context, index) => const Divider(),
-                          itemCount: state.seriesList.length,
+                          itemCount: state.seriesList.length +
+                              (state.hasReachedMax ? 0 : 1),
                           itemBuilder: (context, index) {
+                            if (index >= state.seriesList.length) {
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
                             final series = state.seriesList[index];
                             return GestureDetector(
                               behavior: HitTestBehavior.opaque,
@@ -118,7 +135,8 @@ class _SeriesPageState extends State<SeriesPage> {
                                         di<GetSerieDetails>(),
                                         di<GetEpisodes>(),
                                       )..add(GetSerieDetailsEvent(series.id)),
-                                      child: SerieDetailsPage(serieId: series.id),
+                                      child:
+                                          SerieDetailsPage(serieId: series.id),
                                     ),
                                   ),
                                 );
@@ -129,18 +147,26 @@ class _SeriesPageState extends State<SeriesPage> {
                                     height: 160,
                                     child: series.imageUrl != null
                                         ? ClipRRect(
-                                            borderRadius: BorderRadius.circular(16.0),
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
                                             child: Image.network(
                                               series.imageUrl!,
-                                              width: MediaQuery.of(context).size.width / 3.9,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  3.9,
                                               fit: BoxFit.cover,
                                             ),
                                           )
                                         : ClipRRect(
-                                            borderRadius: BorderRadius.circular(16.0),
+                                            borderRadius:
+                                                BorderRadius.circular(16.0),
                                             child: SvgPicture.asset(
                                               "assets/images/No-Image-Placeholder.svg",
-                                              width: MediaQuery.of(context).size.width / 3.9,
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  3.9,
                                               fit: BoxFit.cover,
                                             ),
                                           ),
