@@ -6,4 +6,5 @@ abstract class ActorsRemoteDataSource {
   Future<List<ActorModel>> searchActors(String query);
   Future<ActorModel> getActorDetails(int actorId);
   Future<List<ActorCastCreditModel>> getActorCastCredits(int actorId);
+  Future<List<ActorModel>> fetchActors(int page);
 }

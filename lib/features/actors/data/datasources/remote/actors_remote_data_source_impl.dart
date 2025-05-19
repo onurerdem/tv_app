@@ -54,4 +54,16 @@ class ActorsRemoteDataSourceImpl implements ActorsRemoteDataSource {
       throw Exception("Failed to load actor cast credits details.");
     }
   }
+
+  @override
+  Future<List<ActorModel>> fetchActors(int page) async {
+    final response = await apiClient.get('$GET_ACTORS$GET_PAGE$page');
+    if (response.statusCode == 200) {
+      return (response.data as List)
+          .map((json) => ActorModel.fromJson(json))
+          .toList();
+    } else {
+      throw Exception('Actors not loaded');
+    }
+  }
 }
