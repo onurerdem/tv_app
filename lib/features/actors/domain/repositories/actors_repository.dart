@@ -8,4 +8,5 @@ abstract class ActorsRepository {
   Future<Either<Failure, List<Actor>>> searchActors(String query);
   Future<Either<Failure, Actor>> getActorDetails(int actorId);
   Future<Either<Failure, List<ActorCastCreditEntity>>> getActorCastCredits(int actorId);
+  Future<Either<Failure, List<Actor>>> fetchActors(int page);
 }

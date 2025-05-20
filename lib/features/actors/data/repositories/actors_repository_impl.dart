@@ -50,4 +50,14 @@ class ActorsRepositoryImpl implements ActorsRepository {
       return Left(ServerFailure());
     }
   }
+
+  @override
+  Future<Either<Failure, List<Actor>>> fetchActors(int page) async {
+    try {
+      final actors = await remoteDataSource.fetchActors(page);
+      return Right(actors);
+    } catch (_) {
+      return Left(ServerFailure());
+    }
+  }
 }
