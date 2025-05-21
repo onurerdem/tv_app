@@ -17,3 +17,5 @@ class SearchActorsQueryEvent extends ActorsEvent {
   @override
   List<Object?> get props => [query];
 }
+
+class FetchActorsEvent extends ActorsEvent {}

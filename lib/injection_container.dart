@@ -183,7 +183,13 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SearchActors(sl<ActorsRepository>()));
   sl.registerLazySingleton(() => GetActorsByPage(sl<ActorsRepository>()));
 
-  sl.registerFactory(() => ActorsBloc(sl<SearchActors>(), sl<GetAllActors>()));
+  sl.registerFactory(
+    () => ActorsBloc(
+      sl<SearchActors>(),
+      sl<GetAllActors>(),
+      sl<GetActorsByPage>(),
+    ),
+  );
 
   sl.registerLazySingleton(
     () => GetActorDetailsUseCase(sl<ActorsRepository>()),

@@ -14,8 +14,9 @@ class ActorsLoading extends ActorsState {}
 
 class ActorsLoaded extends ActorsState {
   final List<Actor> actors;
+  final bool hasReachedMax;
 
-  const ActorsLoaded(this.actors);
+  const ActorsLoaded({required this.actors, required this.hasReachedMax});
 
   @override
   List<Object?> get props => [actors];
