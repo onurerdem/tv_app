@@ -21,18 +21,27 @@ class ActorsPage extends StatefulWidget {
 class _ActorsPageState extends State<ActorsPage> {
   late ActorsBloc bloc;
   final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     bloc = context.read<ActorsBloc>();
-    bloc.add(GetAllActorsEvent());
+    bloc.add(FetchActorsEvent());
+    _scrollController.addListener(_onScroll);
   }
 
   Future<void> _refreshData() async {
     bloc = context.read<ActorsBloc>();
     bloc.add(GetAllActorsEvent());
     FocusScope.of(context).unfocus();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      bloc.add(FetchActorsEvent());
+    }
   }
 
   @override
@@ -98,8 +107,16 @@ class _ActorsPageState extends State<ActorsPage> {
                     } else if (state is ActorsLoaded) {
                       return ListView.separated(
                         separatorBuilder: (context, index) => const Divider(),
-                        itemCount: state.actors.length,
+                        controller: _scrollController,
+                        itemCount:
+                            state.actors.length + (state.hasReachedMax ? 0 : 1),
                         itemBuilder: (context, index) {
+                          if (index >= state.actors.length) {
+                            return const Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
                           final actor = state.actors[index];
                           return GestureDetector(
                             behavior: HitTestBehavior.opaque,
@@ -112,8 +129,8 @@ class _ActorsPageState extends State<ActorsPage> {
                                       di<GetActorDetailsUseCase>(),
                                       di<GetActorCastCreditsUseCase>(),
                                     )..add(
-                                      GetActorDetailsEvent(actor.id),
-                                    ),
+                                        GetActorDetailsEvent(actor.id),
+                                      ),
                                     child: ActorDetailsPage(actorId: actor.id),
                                   ),
                                 ),
@@ -123,23 +140,59 @@ class _ActorsPageState extends State<ActorsPage> {
                               children: [
                                 SizedBox(
                                   height: 160,
-                                  child: actor.imageUrl != null ? ClipRRect(
-                                          borderRadius: BorderRadius.circular(16.0),
+                                  child: actor.imageUrl != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
                                           child: Image.network(
                                             actor.imageUrl!,
                                             width: MediaQuery.of(context)
                                                     .size
-                                                    .width / 3.9,
+                                                    .width /
+                                                3.9,
                                             fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                              child: SvgPicture.asset(
+                                                "assets/images/No-Image-Placeholder.svg",
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    3.9,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    3.9,
+                                                height: 160,
+                                                child: const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                            strokeWidth: 2.0)),
+                                              );
+                                            },
                                           ),
                                         )
                                       : ClipRRect(
-                                          borderRadius: BorderRadius.circular(16.0),
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
                                           child: SvgPicture.asset(
                                             "assets/images/No-Image-Placeholder.svg",
                                             width: MediaQuery.of(context)
                                                     .size
-                                                    .width / 3.9,
+                                                    .width /
+                                                3.9,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -147,7 +200,8 @@ class _ActorsPageState extends State<ActorsPage> {
                                 const SizedBox(width: 16),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         actor.fullName,
@@ -157,8 +211,8 @@ class _ActorsPageState extends State<ActorsPage> {
                                       Text(
                                         actor.country == "Turkey"
                                             ? "Türkiye"
-                                            : actor.country
-                                            ?? "Unknown country",
+                                            : actor.country ??
+                                                "Unknown country",
                                         style: const TextStyle(fontSize: 12),
                                       ),
                                       const SizedBox(height: 12),
@@ -188,7 +242,8 @@ class _ActorsPageState extends State<ActorsPage> {
                       return Center(child: Text(state.message));
                     }
                     return const Center(
-                        child: Text("Enter a term to search for a actor."));
+                      child: Text("Enter a term to search for a actor."),
+                    );
                   },
                 ),
               ),
