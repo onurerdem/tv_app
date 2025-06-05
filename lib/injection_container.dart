@@ -45,6 +45,7 @@ import 'features/serie_favorites/domain/usecases/fetch_favorite_series_details.d
 import 'features/serie_favorites/domain/usecases/get_favorite_series.dart';
 import 'features/serie_favorites/domain/usecases/get_favorites.dart';
 import 'features/serie_favorites/domain/usecases/remove_favorite.dart';
+import 'features/serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
@@ -257,5 +258,15 @@ Future<void> init() async {
     () => GetFavoriteSeries(
       sl<SerieFavoritesRepository>(),
     ),
+  );
+
+  sl.registerFactory<SerieFavoritesBloc>(
+        () => SerieFavoritesBloc(
+      sl<GetFavorites>(),
+      sl<AddFavorite>(),
+      sl<RemoveFavorite>(),
+      sl<FetchFavoriteSeriesDetails>(),
+      sl<GetFavoriteSeries>(),
+    )..add(LoadSerieFavorites()),
   );
 }
