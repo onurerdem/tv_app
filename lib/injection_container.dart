@@ -36,6 +36,15 @@ import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
+import 'features/serie_favorites/data/datasources/remote/serie_favorites_remote_datasource_impl.dart';
+import 'features/serie_favorites/data/datasources/serie_favorites_remote_datasource.dart';
+import 'features/serie_favorites/data/repositories/serie_favorites_repository_impl.dart';
+import 'features/serie_favorites/domain/repositories/serie_favorites_repository.dart';
+import 'features/serie_favorites/domain/usecases/add_favorite.dart';
+import 'features/serie_favorites/domain/usecases/fetch_favorite_series_details.dart';
+import 'features/serie_favorites/domain/usecases/get_favorite_series.dart';
+import 'features/serie_favorites/domain/usecases/get_favorites.dart';
+import 'features/serie_favorites/domain/usecases/remove_favorite.dart';
 import 'features/series/data/datasources/series_remote_data_source.dart';
 import 'features/series/data/repositories/series_repository_impl.dart';
 import 'features/series/domain/repositories/series_repository.dart';
@@ -146,8 +155,8 @@ Future<void> init() async {
   final auth = FirebaseAuth.instance;
   final fireStore = FirebaseFirestore.instance;
 
-  sl.registerLazySingleton(() => auth);
-  sl.registerLazySingleton(() => fireStore);
+  sl.registerLazySingleton<FirebaseAuth>(() => auth);
+  sl.registerLazySingleton<FirebaseFirestore>(() => fireStore);
 
   sl.registerFactory(() => NavigationBloc());
 
@@ -202,6 +211,51 @@ Future<void> init() async {
     () => ActorDetailsBloc(
       sl<GetActorDetailsUseCase>(),
       sl<GetActorCastCreditsUseCase>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SerieFavoritesRemoteDatasource>(
+    () => SerieFavoritesRemoteDatasourceImpl(
+      sl<FirebaseAuth>(),
+      sl<FirebaseFirestore>(),
+      sl<ApiClient>(),
+    ),
+  );
+
+  sl.registerLazySingleton<SerieFavoritesRepository>(
+    () => SerieFavoritesRepositoryImpl(
+      sl<SerieFavoritesRemoteDatasource>(),
+      sl<FirebaseFirestore>(),
+    ),
+  );
+
+  sl.registerLazySingleton<FetchFavoriteSeriesDetails>(
+    () => FetchFavoriteSeriesDetails(
+      sl<SerieFavoritesRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<AddFavorite>(
+    () => AddFavorite(
+      sl<SerieFavoritesRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<RemoveFavorite>(
+    () => RemoveFavorite(
+      sl<SerieFavoritesRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetFavorites>(
+    () => GetFavorites(
+      sl<SerieFavoritesRepository>(),
+    ),
+  );
+
+  sl.registerLazySingleton<GetFavoriteSeries>(
+    () => GetFavoriteSeries(
+      sl<SerieFavoritesRepository>(),
     ),
   );
 }
