@@ -5,6 +5,7 @@ import 'package:tv_app/features/series/presentation/bloc/serie_details_event.dar
 import 'package:tv_app/features/series/presentation/widgets/show_episode_details.dart';
 import 'package:tv_app/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -55,6 +56,44 @@ class SerieDetailsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text("Serie Details"),
+          actions: [
+            BlocBuilder<SerieFavoritesBloc, SerieFavoritesState>(
+              builder: (context, favState) {
+                return BlocBuilder<SerieDetailsBloc, SerieDetailsState>(
+                  builder: (context, serieState) {
+                    if (serieState is SerieDetailsLoaded) {
+                      final currentSerie = serieState.serieDetails;
+                      final isFavorite = (favState is SerieFavoritesLoaded &&
+                          favState.favoriteIds.contains(currentSerie.id));
+
+                      return IconButton(
+                        icon: Icon(
+                          Icons.favorite,
+                          color: isFavorite ? Colors.red : Colors.grey,
+                        ),
+                        tooltip: isFavorite
+                            ? 'Remove to favorites'
+                            : 'Add to favorites.',
+                        onPressed: () {
+                          if (isFavorite) {
+                            context
+                                .read<SerieFavoritesBloc>()
+                                .add(RemoveSerieFromFavorites(currentSerie));
+                          } else {
+                            context
+                                .read<SerieFavoritesBloc>()
+                                .add(AddSerieToFavorites(currentSerie));
+                          }
+                        },
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              },
+            ),
+          ],
         ),
         body: BlocBuilder<SerieDetailsBloc, SerieDetailsState>(
           builder: (context, state) {

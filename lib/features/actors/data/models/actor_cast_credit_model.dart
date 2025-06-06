@@ -1,7 +1,11 @@
 import 'package:tv_app/features/actors/domain/entities/actor_cast_credit_entity.dart';
 
+import '../../../series/data/models/series_model.dart';
+import '../../../series/domain/entities/series.dart';
+
 class ActorCastCreditModel extends ActorCastCreditEntity {
   const ActorCastCreditModel({
+    required super.serie,
     required super.serieName,
     required super.characterName,
     required super.imageUrl,
@@ -9,15 +13,20 @@ class ActorCastCreditModel extends ActorCastCreditEntity {
   });
 
   factory ActorCastCreditModel.fromJson(Map<String, dynamic> json) {
-    final serie = json['_links']?['show'];
     final character = json['_links']?['character'];
-    final imageUrl = json['_embedded']?['show'];
-    final serieId = json['_embedded']?['show'];
+
+    final embeddedShow = json['_embedded']?['show'];
+
+    final Series serie = embeddedShow != null
+        ? SeriesModel.fromJson(embeddedShow)
+        : throw Exception("Missing show info");
+
     return ActorCastCreditModel(
-      serieName: serie?['name'] ?? 'Unknown Serie',
+      serie: serie,
+      serieName: embeddedShow?['name'] ?? 'Unknown Serie.',
       characterName: character?['name'],
-      imageUrl: imageUrl?['image']['medium'],
-      serieId: serieId['id'],
+      imageUrl: embeddedShow?['image']?['medium'],
+      serieId: embeddedShow?['id'] ?? 0,
     );
   }
 }

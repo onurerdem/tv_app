@@ -7,6 +7,7 @@ import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart
 import 'package:tv_app/features/series/presentation/bloc/serie_details_event.dart';
 import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
 import 'package:tv_app/injection_container.dart';
+import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import '../../../series/domain/usecases/get_episodes.dart';
 import '../../domain/entities/actor.dart';
 import '../bloc/actor_details_bloc.dart';
@@ -277,6 +278,33 @@ class ActorDetailsPage extends StatelessWidget {
                                         ),
                                       ],
                                     ),
+                                  ),
+                                  BlocBuilder<SerieFavoritesBloc,
+                                      SerieFavoritesState>(
+                                    builder: (context, favState) {
+                                      final isFav =
+                                          favState is SerieFavoritesLoaded &&
+                                              favState.favoriteIds.contains(
+                                                  actorCastCredits.serieId);
+
+                                      return IconButton(
+                                        icon: Icon(
+                                          Icons.favorite,
+                                          color: isFav ? Colors.red : Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          final blocFav =
+                                          context.read<SerieFavoritesBloc>();
+                                          if (isFav) {
+                                            blocFav.add(RemoveSerieFromFavorites(
+                                                actorCastCredits.serie));
+                                          } else {
+                                            blocFav.add(AddSerieToFavorites(
+                                                actorCastCredits.serie));
+                                          }
+                                        },
+                                      );
+                                    },
                                   ),
                                 ],
                               ),
