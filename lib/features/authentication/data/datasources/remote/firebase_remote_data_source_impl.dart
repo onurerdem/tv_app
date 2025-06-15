@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../../../core/error/failures.dart';
+import '../../../../../core/utils/constants.dart';
 import '../../../domain/entities/user_entity.dart';
 import '../../models/user_model.dart';
 import '../firebase_remote_data_source.dart';
@@ -16,7 +17,7 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
 
   @override
   Future<void> getCreateCurrentUser(UserEntity user) async {
-    final userCollectionRef = firestore.collection("Users");
+    final userCollectionRef = firestore.collection(USERS);
     final uid = await getCurrentUId();
     userCollectionRef.doc(uid).get().then((value) {
       final newUser = UserModel(
@@ -80,7 +81,7 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
 
   @override
   Future<Map<String, dynamic>> getUserProfile(String uid) async {
-    final doc = await firestore.collection("Users").doc(uid).get();
+    final doc = await firestore.collection(USERS).doc(uid).get();
     if (doc.exists) {
       return doc.data()!;
     } else {
@@ -92,7 +93,7 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
   Future<Either<Failure, UserEntity>> updateUserProfile(UserEntity user) async {
     try {
       final uid = await getCurrentUId();
-      final userCollection = firestore.collection("Users");
+      final userCollection = firestore.collection(USERS);
       final updatedData = UserModel(
         uid: uid,
         name: user.name,
@@ -124,7 +125,8 @@ class FirebaseRemoteDataSourceImpl implements FirebaseRemoteDataSource {
       await user.reauthenticateWithCredential(credential);
       await user.updatePassword(newPassword);
     } on FirebaseAuthException catch (e) {
-      debugPrint("FirebaseAuthException caught: code=${e.code}, message=${e.message}");
+      debugPrint(
+          "FirebaseAuthException caught: code=${e.code}, message=${e.message}");
       if (e.code == "wrong-password" || e.code == "invalid-credential") {
         throw OldPasswordWrongFailure();
       } else if (e.code == "weak-password") {
@@ -141,7 +143,7 @@ Future<String> _getEmailFromUsername(
   FirebaseFirestore firestore,
 ) async {
   final QuerySnapshot snapshot = await firestore
-      .collection('Users')
+      .collection(USERS)
       .where('username', isEqualTo: username)
       .get();
 
@@ -151,7 +153,7 @@ Future<String> _getEmailFromUsername(
 Future<bool> isTheUsernameAvailable(String username) async {
   try {
     final usernameDoc = await FirebaseFirestore.instance
-        .collection('Users')
+        .collection(USERS)
         .where('username', isEqualTo: username)
         .get();
     return usernameDoc.docs.isNotEmpty;
@@ -166,7 +168,7 @@ Future<bool> isTheUsernameAvailable(String username) async {
 Future<bool> isTheEmailRegistered(String email) async {
   try {
     final emailDoc = await FirebaseFirestore.instance
-        .collection('Users')
+        .collection(USERS)
         .where('email', isEqualTo: email)
         .get();
     return emailDoc.docs.isNotEmpty;
