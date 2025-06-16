@@ -38,9 +38,6 @@ class FavoriteActorsRemoteDataSourceImpl
     final userCollectionRef = firestore.collection(USERS);
     final uid = auth.currentUser!.uid;
     final querySnapshot = await userCollectionRef.doc(uid).collection(FAVORITE_ACTORS).get();
-    /*return querySnapshot.docs
-        .map((doc) => ActorModel.fromJson(doc.data()))
-        .toList();*/
     final ids = querySnapshot.docs.map((doc) => int.parse(doc.id)).toList();
 
     final futures = ids.map((id) async {
