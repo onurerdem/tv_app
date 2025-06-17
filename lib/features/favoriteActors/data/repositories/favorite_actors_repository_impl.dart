@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
-import '../../../features/actors/domain/entities/actor.dart';
+import '../../../actors/domain/entities/actor.dart';
 import '../../domain/repositories/favorite_actors_repository.dart';
 import '../datasources/favorite_actors_remote_data_source.dart';
 

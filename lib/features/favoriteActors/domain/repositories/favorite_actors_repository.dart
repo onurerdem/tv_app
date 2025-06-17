@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
-
 import '../../../../core/error/failures.dart';
-import '../../../features/actors/domain/entities/actor.dart';
+import '../../../actors/domain/entities/actor.dart';
 
 abstract class FavoriteActorsRepository {
   Future<Either<Failure, void>> addActorToFavorites(Actor actor);

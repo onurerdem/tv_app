@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tv_app/core/utils/constants.dart';
 import '../../../../../core/network/api_client.dart';
-import '../../../../features/actors/data/models/actor_model.dart';
+import '../../../../actors/data/models/actor_model.dart';
 import '../favorite_actors_remote_data_source.dart';
 
 class FavoriteActorsRemoteDataSourceImpl

@@ -1,4 +1,4 @@
-import '../../../features/actors/data/models/actor_model.dart';
+import '../../../actors/data/models/actor_model.dart';
 
 abstract class FavoriteActorsRemoteDataSource {
   Future<void> addFavoriteActor(ActorModel actor);
