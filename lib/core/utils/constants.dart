@@ -8,3 +8,7 @@ const GET_PAGE = "?page=";
 const GET_ACTORS = "/people";
 const GET_SEARCH_ACTORS = "/search/people?q=";
 const GET_CAST_CREDITS = "/castcredits?embed=show";
+
+const USERS = "Users";
+const FAVORITE_SERIES = "Favorite Series";
+const FAVORITE_ACTORS = "Favorite Actors";

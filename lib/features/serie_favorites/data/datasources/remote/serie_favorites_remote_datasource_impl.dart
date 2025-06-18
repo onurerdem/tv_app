@@ -18,22 +18,22 @@ class SerieFavoritesRemoteDatasourceImpl
 
   @override
   Future<void> addFavorite(int seriesId) async {
-    final userCollectionRef = firestore.collection("Users");
+    final userCollectionRef = firestore.collection(USERS);
     final uid = auth.currentUser!.uid;
     await userCollectionRef
         .doc(uid)
-        .collection('Favorites')
+        .collection(FAVORITE_SERIES)
         .doc(seriesId.toString())
         .set({});
   }
 
   @override
   Future<void> removeFavorite(int seriesId) async {
-    final userCollectionRef = firestore.collection("Users");
+    final userCollectionRef = firestore.collection(USERS);
     final uid = auth.currentUser!.uid;
     await userCollectionRef
         .doc(uid)
-        .collection('Favorites')
+        .collection(FAVORITE_SERIES)
         .doc(seriesId.toString())
         .delete();
   }
@@ -41,10 +41,10 @@ class SerieFavoritesRemoteDatasourceImpl
   @override
   Future<List<int>> getFavorites() async {
     try {
-      final userCollectionRef = firestore.collection("Users");
+      final userCollectionRef = firestore.collection(USERS);
       final uid = auth.currentUser!.uid;
       final snapshot =
-          await userCollectionRef.doc(uid).collection('Favorites').get();
+          await userCollectionRef.doc(uid).collection(FAVORITE_SERIES).get();
       final favoriteIds =
           snapshot.docs.map((doc) => int.parse(doc.id)).toList();
 
@@ -80,10 +80,10 @@ class SerieFavoritesRemoteDatasourceImpl
 
   @override
   Future<List<Series>> getFavoriteSeries() async {
-    final userCollectionRef = firestore.collection("Users");
+    final userCollectionRef = firestore.collection(USERS);
     final uid = auth.currentUser!.uid;
     final snapshot =
-        await userCollectionRef.doc(uid).collection('Favorites').get();
+        await userCollectionRef.doc(uid).collection(FAVORITE_SERIES).get();
     final ids = snapshot.docs.map((doc) => int.parse(doc.id)).toList();
 
     final futures = ids.map((id) async {

@@ -2,50 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import '../../../favoriteActors/presentation/bloc/favorite_actors_bloc.dart';
-import '../../../favoriteActors/presentation/bloc/favorite_actors_event.dart';
-import '../../../favoriteActors/presentation/bloc/favorite_actors_state.dart';
-import '../../../favoriteActors/presentation/page/favorite_actors_page.dart';
-import '../../domain/usecases/get_actor_cast_credits_usecase.dart';
-import '../../domain/usecases/get_actor_details_usecase.dart';
-import '../bloc/actor_details_bloc.dart';
-import '../bloc/actor_details_event.dart';
-import '../bloc/actors_bloc.dart';
-import '../bloc/actors_event.dart';
-import '../bloc/actors_state.dart';
-import 'actor_details_page.dart';
+import '../../../actors/domain/usecases/get_actor_cast_credits_usecase.dart';
+import '../../../actors/domain/usecases/get_actor_details_usecase.dart';
+import '../../../actors/presentation/bloc/actor_details_bloc.dart';
+import '../../../actors/presentation/bloc/actor_details_event.dart';
+import '../../../actors/presentation/pages/actor_details_page.dart';
+import '../bloc/favorite_actors_bloc.dart';
+import '../bloc/favorite_actors_event.dart';
+import '../bloc/favorite_actors_state.dart';
 
-class ActorsPage extends StatefulWidget {
-  const ActorsPage({super.key});
+class FavoriteActorsPage extends StatefulWidget {
+  const FavoriteActorsPage({super.key});
 
   @override
-  State<ActorsPage> createState() => _ActorsPageState();
+  State<FavoriteActorsPage> createState() => _FavoriteActorsPageState();
 }
 
-class _ActorsPageState extends State<ActorsPage> {
-  late ActorsBloc _actorsBloc;
+class _FavoriteActorsPageState extends State<FavoriteActorsPage> {
+  late FavoriteActorsBloc favoriteActorsBloc;
   final TextEditingController _searchController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _actorsBloc = context.read<ActorsBloc>();
-    _actorsBloc.add(FetchActorsEvent());
-    _scrollController.addListener(_onScroll);
+    favoriteActorsBloc = context.read<FavoriteActorsBloc>();
+    favoriteActorsBloc.add(LoadFavoritesEvent());
   }
 
   Future<void> _refreshData() async {
-    _actorsBloc = context.read<ActorsBloc>();
-    _actorsBloc.add(GetAllActorsEvent());
+    favoriteActorsBloc = context.read<FavoriteActorsBloc>();
+    favoriteActorsBloc.add(LoadFavoritesEvent());
+    context.read<FavoriteActorsBloc>().add(LoadFavoritesEvent());
     FocusScope.of(context).unfocus();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-        _scrollController.position.maxScrollExtent - 200) {
-      _actorsBloc.add(FetchActorsEvent());
-    }
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    final query = _searchController.text;
+    favoriteActorsBloc.add(SearchFavoriteActors(query));
   }
 
   @override
@@ -53,30 +53,7 @@ class _ActorsPageState extends State<ActorsPage> {
     final di = GetIt.instance;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Actors"),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.favorite,
-              color: Colors.red,
-            ),
-            tooltip: 'Favorite Actors',
-            onPressed: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (newContext) => BlocProvider.value(
-                    value: context.read<FavoriteActorsBloc>()
-                      ..add(LoadFavoritesEvent()),
-                    child: const FavoriteActorsPage(),
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text("Favorite Actors")),
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: Padding(
@@ -87,61 +64,73 @@ class _ActorsPageState extends State<ActorsPage> {
                 controller: _searchController,
                 cursorColor: Colors.black,
                 decoration: InputDecoration(
-                  labelText: "Search for actors.",
+                  labelText: "Search for favorite actors.",
                   floatingLabelStyle: const TextStyle(
                     color: Colors.black,
                   ),
                   prefixIcon: IconButton(
                     icon: const Icon(Icons.search),
                     onPressed: () {
-                      _actorsBloc.add(
-                        SearchActorsQueryEvent(_searchController.text.trim()),
+                      favoriteActorsBloc.add(
+                        SearchFavoriteActors(_searchController.text.trim()),
                       );
+                      context
+                          .read<FavoriteActorsBloc>()
+                          .add(LoadFavoritesEvent());
                       FocusScope.of(context).unfocus();
                     },
                   ),
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () {
-                      _actorsBloc.add(
-                        SearchActorsQueryEvent(_searchController.text = ""),
+                      favoriteActorsBloc.add(
+                        SearchFavoriteActors(_searchController.text = ""),
                       );
+                      context
+                          .read<FavoriteActorsBloc>()
+                          .add(LoadFavoritesEvent());
                       FocusScope.of(context).unfocus();
                     },
                   ),
                 ),
                 onChanged: (query) {
-                  _actorsBloc.add(
-                    SearchActorsQueryEvent(query.trim()),
+                  favoriteActorsBloc.add(
+                    SearchFavoriteActors(query.trim()),
                   );
                 },
                 textInputAction: TextInputAction.search,
                 onSubmitted: (query) {
-                  _actorsBloc.add(
-                    SearchActorsQueryEvent(query.trim()),
+                  favoriteActorsBloc.add(
+                    SearchFavoriteActors(query.trim()),
                   );
                 },
               ),
               const SizedBox(height: 12),
               Expanded(
-                child: BlocBuilder<ActorsBloc, ActorsState>(
+                child: BlocConsumer<FavoriteActorsBloc, FavoriteActorsState>(
+                  listener: (context, state) {
+                    if (state is FavoritesError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Error: ${state.message}")),
+                      );
+                    }
+                  },
                   builder: (context, state) {
-                    if (state is ActorsLoading) {
+                    if (state is FavoritesLoading) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (state is ActorsLoaded) {
+                    } else if (state is FavoritesLoaded) {
+                      final actors = state.favoriteActors;
+                      if (actors.isEmpty) {
+                        return const Center(
+                          child: Text("No favorite actors yet."),
+                        );
+                      }
                       return ListView.separated(
+                        itemCount: actors.length,
                         separatorBuilder: (context, index) => const Divider(),
-                        controller: _scrollController,
-                        itemCount:
-                            state.actors.length + (state.hasReachedMax ? 0 : 1),
                         itemBuilder: (context, index) {
-                          if (index >= state.actors.length) {
-                            return const Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(child: CircularProgressIndicator()),
-                            );
-                          }
-                          final actor = state.actors[index];
+                          final actor = actors[index];
+
                           return GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             onTap: () {
@@ -189,11 +178,8 @@ class _ActorsPageState extends State<ActorsPage> {
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
-                                            loadingBuilder: (
-                                              context,
-                                              child,
-                                              loadingProgress,
-                                            ) {
+                                            loadingBuilder: (context, child,
+                                                loadingProgress) {
                                               if (loadingProgress == null) {
                                                 return child;
                                               }
@@ -282,9 +268,12 @@ class _ActorsPageState extends State<ActorsPage> {
                                       onPressed: () {
                                         if (isFav) {
                                           bloc.add(
-                                              RemoveFromFavoritesEvent(actor));
+                                            RemoveFromFavoritesEvent(actor),
+                                          );
                                         } else {
-                                          bloc.add(AddToFavoritesEvent(actor));
+                                          bloc.add(
+                                            AddToFavoritesEvent(actor),
+                                          );
                                         }
                                       },
                                     );
@@ -295,11 +284,11 @@ class _ActorsPageState extends State<ActorsPage> {
                           );
                         },
                       );
-                    } else if (state is ActorsError) {
+                    } else if (state is FavoritesError) {
                       return Center(child: Text(state.message));
                     }
                     return const Center(
-                      child: Text("Enter a term to search for a actor."),
+                      child: Text("Favorite series could not be loaded."),
                     );
                   },
                 ),

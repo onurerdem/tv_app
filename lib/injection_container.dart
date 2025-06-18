@@ -35,6 +35,14 @@ import 'features/authentication/domain/usacases/update_user_profile_usecase.dart
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
+import 'features/favoriteActors/data/datasources/remote/favorite_actors_remote_data_source_impl.dart';
+import 'features/favoriteActors/data/repositories/favorite_actors_repository_impl.dart';
+import 'features/favoriteActors/domain/repositories/favorite_actors_repository.dart';
+import 'features/favoriteActors/domain/usecases/add_actor_to_favorites.dart';
+import 'features/favoriteActors/domain/usecases/get_favorite_actors.dart';
+import 'features/favoriteActors/domain/usecases/remove_actor_from_favorites.dart';
+import 'features/favoriteActors/presentation/bloc/favorite_actors_bloc.dart';
+import 'features/favoriteActors/presentation/bloc/favorite_actors_event.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'features/serie_favorites/data/datasources/remote/serie_favorites_remote_datasource_impl.dart';
 import 'features/serie_favorites/data/datasources/serie_favorites_remote_datasource.dart';
@@ -261,12 +269,45 @@ Future<void> init() async {
   );
 
   sl.registerFactory<SerieFavoritesBloc>(
-        () => SerieFavoritesBloc(
+    () => SerieFavoritesBloc(
       sl<GetFavorites>(),
       sl<AddFavorite>(),
       sl<RemoveFavorite>(),
       sl<FetchFavoriteSeriesDetails>(),
       sl<GetFavoriteSeries>(),
     )..add(LoadSerieFavorites()),
+  );
+
+  sl.registerLazySingleton(
+    () => FavoriteActorsRemoteDataSourceImpl(
+      sl<FirebaseAuth>(),
+      sl<FirebaseFirestore>(),
+      sl<ApiClient>(),
+    ),
+  );
+
+  sl.registerLazySingleton<FavoriteActorsRepository>(
+    () => FavoriteActorsRepositoryImpl(
+      sl<FavoriteActorsRemoteDataSourceImpl>(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => AddActorToFavorites(sl<FavoriteActorsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RemoveActorFromFavorites(sl<FavoriteActorsRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetFavoriteActors(sl<FavoriteActorsRepository>()),
+  );
+
+  sl.registerFactory(
+        () => FavoriteActorsBloc(
+      sl<GetFavoriteActors>(),
+      sl<GetActorDetailsUseCase>(),
+      sl<AddActorToFavorites>(),
+      sl<RemoveActorFromFavorites>(),
+    )..add(LoadFavoritesEvent()),
   );
 }

@@ -9,6 +9,8 @@ import 'features/actors/presentation/bloc/actor_details_bloc.dart';
 import 'features/actors/presentation/bloc/actors_bloc.dart';
 import 'features/authentication/presentation/bloc/profile_bloc.dart';
 import 'features/authentication/presentation/cubit/user/user_cubit.dart';
+import 'features/favoriteActors/presentation/bloc/favorite_actors_bloc.dart';
+import 'features/favoriteActors/presentation/bloc/favorite_actors_event.dart';
 import 'features/navigation/presentation/bloc/navigation_bloc.dart';
 import 'features/serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import 'features/series/domain/usecases/get_episodes.dart';
@@ -67,7 +69,16 @@ class MyApp extends StatelessWidget {
           ),
         ),
         BlocProvider<SerieFavoritesBloc>(
-          create: (_) => di.sl<SerieFavoritesBloc>()..add(LoadSerieFavorites()),
+          create: (_) => di.sl<SerieFavoritesBloc>()
+            ..add(
+              LoadSerieFavorites(),
+            ),
+        ),
+        BlocProvider<FavoriteActorsBloc>(
+          create: (_) => di.sl<FavoriteActorsBloc>()
+            ..add(
+              LoadFavoritesEvent(),
+            ),
         ),
       ],
       child: MaterialApp(
