@@ -13,7 +13,6 @@ class FavoritesLoading extends FavoriteActorsState {}
 class FavoritesLoaded extends FavoriteActorsState {
   final Actor actorDetails;
   final List<Actor> favoriteActors;
-  //final List<int> favoriteActorIDs;
   FavoritesLoaded(this.favoriteActors, this.actorDetails);
 
   @override

@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tv_app/features/serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
+import 'package:tv_app/features/series/domain/usecases/get_episodes.dart';
 import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_event.dart';
 import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
 import 'package:tv_app/injection_container.dart';
-import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
-import '../../../series/domain/usecases/get_episodes.dart';
+import '../../../favoriteActors/presentation/bloc/favorite_actors_bloc.dart';
+import '../../../favoriteActors/presentation/bloc/favorite_actors_event.dart';
+import '../../../favoriteActors/presentation/bloc/favorite_actors_state.dart';
 import '../../domain/entities/actor.dart';
 import '../bloc/actor_details_bloc.dart';
 import '../bloc/actor_details_event.dart';
@@ -47,6 +50,44 @@ class ActorDetailsPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Actor Details'),
+          actions: [
+            BlocBuilder<FavoriteActorsBloc, FavoriteActorsState>(
+              builder: (context, favState) {
+                return BlocBuilder<ActorDetailsBloc, ActorDetailsState>(
+                  builder: (context, actorState) {
+                    if (actorState is ActorDetailsLoaded) {
+                      final currentSerie = actorState.actorDetails;
+                      final isFavorite = (favState is FavoritesLoaded &&
+                          favState.favoriteActors.contains(currentSerie));
+
+                      return IconButton(
+                        icon: Icon(
+                          Icons.favorite,
+                          color: isFavorite ? Colors.red : Colors.grey,
+                        ),
+                        tooltip: isFavorite
+                            ? 'Remove to favorites'
+                            : 'Add to favorites.',
+                        onPressed: () {
+                          if (isFavorite) {
+                            context
+                                .read<FavoriteActorsBloc>()
+                                .add(RemoveFromFavoritesEvent(currentSerie));
+                          } else {
+                            context
+                                .read<FavoriteActorsBloc>()
+                                .add(AddToFavoritesEvent(currentSerie));
+                          }
+                        },
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              },
+            ),
+          ],
         ),
         body: BlocBuilder<ActorDetailsBloc, ActorDetailsState>(
           builder: (context, state) {
@@ -75,16 +116,19 @@ class ActorDetailsPage extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16.0),
                                     child: SvgPicture.asset(
                                       "assets/images/No-Image-Placeholder.svg",
-                                      width: MediaQuery.of(context).size.width / 3.9,
+                                      width: MediaQuery.of(context).size.width /
+                                          3.9,
                                       fit: BoxFit.cover,
                                     ),
                                   ),
-                                  loadingBuilder: (context, child, loadingProgress) {
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
                                     if (loadingProgress == null) {
                                       return child;
                                     }
                                     return SizedBox(
-                                      width: MediaQuery.of(context).size.width / 3.9,
+                                      width: MediaQuery.of(context).size.width /
+                                          3.9,
                                       height: 160,
                                       child: const Center(
                                         child: CircularProgressIndicator(
@@ -175,141 +219,163 @@ class ActorDetailsPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      ...state.actorCastCredits.map((actorCastCredits) => Padding(
-                            padding: const EdgeInsets.only(bottom: 16.0),
-                            child: GestureDetector(
-                              behavior: HitTestBehavior.opaque,
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => BlocProvider(
-                                      create: (context) => SerieDetailsBloc(
-                                        di<GetSerieDetails>(),
-                                        di<GetEpisodes>(),
-                                      )..add(
-                                          GetSerieDetailsEvent(
-                                            actorCastCredits.serieId,
-                                          ),
+                      ...state.actorCastCredits.map(
+                        (actorCastCredits) => Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => BlocProvider(
+                                    create: (context) => SerieDetailsBloc(
+                                      di<GetSerieDetails>(),
+                                      di<GetEpisodes>(),
+                                    )..add(
+                                        GetSerieDetailsEvent(
+                                          actorCastCredits.serieId,
                                         ),
-                                      child: SerieDetailsPage(
-                                        serieId: actorCastCredits.serieId,
                                       ),
+                                    child: SerieDetailsPage(
+                                      serieId: actorCastCredits.serieId,
                                     ),
                                   ),
-                                );
-                              },
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    height: 160,
-                                    child: actorCastCredits.imageUrl != null
-                                        ? ClipRRect(
-                                            borderRadius: BorderRadius.circular(16.0),
-                                            child: Image.network(
-                                              actorCastCredits.imageUrl!,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width / 3.9,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) =>
-                                                  ClipRRect(
-                                                borderRadius: BorderRadius.circular(16.0),
-                                                child: SvgPicture.asset(
-                                                  "assets/images/No-Image-Placeholder.svg",
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width / 3.9,
-                                                  fit: BoxFit.cover,
-                                                ),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  height: 160,
+                                  child: actorCastCredits.imageUrl != null
+                                      ? ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
+                                          child: Image.network(
+                                            actorCastCredits.imageUrl!,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                3.9,
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.0),
+                                              child: SvgPicture.asset(
+                                                "assets/images/No-Image-Placeholder.svg",
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    3.9,
+                                                fit: BoxFit.cover,
                                               ),
-                                              loadingBuilder: (context, child, loadingProgress) {
-                                                if (loadingProgress == null) {
-                                                  return child;
-                                                }
-                                                return SizedBox(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width / 3.9,
-                                                  height: 160,
-                                                  child: const Center(
-                                                      child: CircularProgressIndicator(
-                                                              strokeWidth: 2.0,
-                                                      ),
+                                            ),
+                                            loadingBuilder: (
+                                              context,
+                                              child,
+                                              loadingProgress,
+                                            ) {
+                                              if (loadingProgress == null) {
+                                                return child;
+                                              }
+                                              return SizedBox(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    3.9,
+                                                height: 160,
+                                                child: const Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    strokeWidth: 2.0,
                                                   ),
-                                                );
-                                              },
-                                            ),
-                                          )
-                                        : ClipRRect(
-                                            borderRadius: BorderRadius.circular(16.0),
-                                            child: SvgPicture.asset(
-                                              "assets/images/No-Image-Placeholder.svg",
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width / 3.9,
-                                              fit: BoxFit.cover,
-                                            ),
+                                                ),
+                                              );
+                                            },
                                           ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        RichText(
-                                          text: boldLabelTextSpan(
-                                            "Serie: ",
-                                            actorCastCredits.serieName,
-                                            Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
+                                        )
+                                      : ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(16.0),
+                                          child: SvgPicture.asset(
+                                            "assets/images/No-Image-Placeholder.svg",
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                3.9,
+                                            fit: BoxFit.cover,
                                           ),
                                         ),
-                                        const SizedBox(height: 16),
-                                        RichText(
-                                          text: boldLabelTextSpan(
-                                            "Character: ",
-                                            actorCastCredits.characterName ?? "Unknown character",
-                                            Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      RichText(
+                                        text: boldLabelTextSpan(
+                                          "Serie: ",
+                                          actorCastCredits.serieName,
+                                          Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      RichText(
+                                        text: boldLabelTextSpan(
+                                          "Character: ",
+                                          actorCastCredits.characterName ??
+                                              "Unknown character",
+                                          Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  BlocBuilder<SerieFavoritesBloc,
-                                      SerieFavoritesState>(
-                                    builder: (context, favState) {
-                                      final isFav =
-                                          favState is SerieFavoritesLoaded &&
-                                              favState.favoriteIds.contains(
-                                                  actorCastCredits.serieId);
+                                ),
+                                BlocBuilder<SerieFavoritesBloc,
+                                    SerieFavoritesState>(
+                                  builder: (context, favState) {
+                                    final isFav = favState
+                                            is SerieFavoritesLoaded &&
+                                        favState.favoriteIds
+                                            .contains(actorCastCredits.serieId);
 
-                                      return IconButton(
-                                        icon: Icon(
-                                          Icons.favorite,
-                                          color: isFav ? Colors.red : Colors.grey,
-                                        ),
-                                        onPressed: () {
-                                          final blocFav =
-                                          context.read<SerieFavoritesBloc>();
-                                          if (isFav) {
-                                            blocFav.add(RemoveSerieFromFavorites(
-                                                actorCastCredits.serie));
-                                          } else {
-                                            blocFav.add(AddSerieToFavorites(
-                                                actorCastCredits.serie));
-                                          }
-                                        },
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                    return IconButton(
+                                      icon: Icon(
+                                        Icons.favorite,
+                                        color: isFav ? Colors.red : Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        final blocFav =
+                                            context.read<SerieFavoritesBloc>();
+                                        if (isFav) {
+                                          blocFav.add(
+                                            RemoveSerieFromFavorites(
+                                              actorCastCredits.serie,
+                                            ),
+                                          );
+                                        } else {
+                                          blocFav.add(
+                                            AddSerieToFavorites(
+                                              actorCastCredits.serie,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
+                        ),
                       ),
                     ],
                   ),

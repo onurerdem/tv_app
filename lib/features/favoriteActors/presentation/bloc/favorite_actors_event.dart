@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-
 import '../../../actors/domain/entities/actor.dart';
 
 abstract class FavoriteActorsEvent extends Equatable {
@@ -26,12 +25,6 @@ class AddToFavoritesEvent extends FavoriteActorsEvent {
 }
 
 class RemoveFromFavoritesEvent extends FavoriteActorsEvent {
-  /*final int actorId;
-  RemoveFromFavoritesEvent(this.actorId);
-
-  @override
-  List<Object?> get props => [actorId];*/
-
   final Actor actor;
   RemoveFromFavoritesEvent(this.actor);
 
