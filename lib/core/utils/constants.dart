@@ -12,3 +12,4 @@ const GET_CAST_CREDITS = "/castcredits?embed=show";
 const USERS = "Users";
 const FAVORITE_SERIES = "Favorite Series";
 const FAVORITE_ACTORS = "Favorite Actors";
+const WATCHLIST = "Watchlist";
