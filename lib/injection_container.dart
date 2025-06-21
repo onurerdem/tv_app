@@ -69,6 +69,8 @@ import 'features/watchlist/domain/repositories/watchlist_repository.dart';
 import 'features/watchlist/domain/usecases/add_to_watchlist.dart';
 import 'features/watchlist/domain/usecases/get_watchlist.dart';
 import 'features/watchlist/domain/usecases/remove_from_watchlist.dart';
+import 'features/watchlist/presentation/bloc/watchlist_bloc.dart';
+import 'features/watchlist/presentation/bloc/watchlist_event.dart';
 
 final sl = GetIt.instance;
 
@@ -336,4 +338,12 @@ Future<void> init() async {
   sl.registerLazySingleton(
           () => RemoveFromWatchlist(sl<WatchlistRepository>()));
   sl.registerLazySingleton(() => GetWatchlist(sl<WatchlistRepository>()));
+
+  sl.registerFactory(
+        () => WatchlistBloc(
+      sl<GetWatchlist>(),
+      sl<AddToWatchlist>(),
+      sl<RemoveFromWatchlist>(),
+    )..add(LoadWatchlist()),
+  );
 }
