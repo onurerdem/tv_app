@@ -62,6 +62,15 @@ import 'features/series/domain/usecases/get_series_by_page.dart';
 import 'features/series/domain/usecases/search_series.dart';
 import 'core/network/api_client.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
+import 'features/watchlist/data/datasources/remote/watchlist_remote_data_source_impl.dart';
+import 'features/watchlist/data/datasources/watchlist_remote_data_source.dart';
+import 'features/watchlist/data/repositories/watchlist_repository_impl.dart';
+import 'features/watchlist/domain/repositories/watchlist_repository.dart';
+import 'features/watchlist/domain/usecases/add_to_watchlist.dart';
+import 'features/watchlist/domain/usecases/get_watchlist.dart';
+import 'features/watchlist/domain/usecases/remove_from_watchlist.dart';
+import 'features/watchlist/presentation/bloc/watchlist_bloc.dart';
+import 'features/watchlist/presentation/bloc/watchlist_event.dart';
 
 final sl = GetIt.instance;
 
@@ -309,5 +318,32 @@ Future<void> init() async {
       sl<AddActorToFavorites>(),
       sl<RemoveActorFromFavorites>(),
     )..add(LoadFavoritesEvent()),
+  );
+
+  sl.registerLazySingleton<WatchlistRemoteDataSource>(
+        () => WatchlistRemoteDataSourceImpl(
+      sl<FirebaseAuth>(),
+      sl<FirebaseFirestore>(),
+      sl<ApiClient>(),
+    ),
+  );
+
+  sl.registerLazySingleton<WatchlistRepository>(
+        () => WatchlistRepositoryImpl(
+      sl<WatchlistRemoteDataSource>(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => AddToWatchlist(sl<WatchlistRepository>()));
+  sl.registerLazySingleton(
+          () => RemoveFromWatchlist(sl<WatchlistRepository>()));
+  sl.registerLazySingleton(() => GetWatchlist(sl<WatchlistRepository>()));
+
+  sl.registerFactory(
+        () => WatchlistBloc(
+      sl<GetWatchlist>(),
+      sl<AddToWatchlist>(),
+      sl<RemoveFromWatchlist>(),
+    )..add(LoadWatchlist()),
   );
 }
