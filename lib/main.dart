@@ -17,6 +17,8 @@ import 'features/series/domain/usecases/get_episodes.dart';
 import 'features/series/domain/usecases/get_serie_details.dart';
 import 'features/series/presentation/bloc/serie_details_bloc.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
+import 'features/watchlist/presentation/bloc/watchlist_bloc.dart';
+import 'features/watchlist/presentation/bloc/watchlist_event.dart';
 import 'injection_container.dart' as di;
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -78,6 +80,12 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<FavoriteActorsBloc>()
             ..add(
               LoadFavoritesEvent(),
+            ),
+        ),
+        BlocProvider<WatchlistBloc>(
+          create: (_) => di.sl<WatchlistBloc>()
+            ..add(
+              LoadWatchlist(),
             ),
         ),
       ],

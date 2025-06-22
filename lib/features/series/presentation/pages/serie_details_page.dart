@@ -6,6 +6,9 @@ import 'package:tv_app/features/series/presentation/widgets/show_episode_details
 import 'package:tv_app/injection_container.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
+import '../../../watchlist/presentation/bloc/watchlist_bloc.dart';
+import '../../../watchlist/presentation/bloc/watchlist_event.dart';
+import '../../../watchlist/presentation/bloc/watchlist_state.dart';
 import '../bloc/serie_details_bloc.dart';
 import '../bloc/serie_details_state.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -50,6 +53,8 @@ class SerieDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final watchlistBloc = context.read<WatchlistBloc>();
+
     return BlocProvider(
       create: (context) =>
           sl<SerieDetailsBloc>()..add(GetSerieDetailsEvent(serieId)),
@@ -83,6 +88,49 @@ class SerieDetailsPage extends StatelessWidget {
                             context
                                 .read<SerieFavoritesBloc>()
                                 .add(AddSerieToFavorites(currentSerie));
+                          }
+                        },
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                );
+              },
+            ),
+            BlocBuilder<WatchlistBloc, WatchlistState>(
+              builder: (context, watchlistState) {
+                return BlocBuilder<SerieDetailsBloc, SerieDetailsState>(
+                  builder: (context, serieState) {
+                    if (serieState is SerieDetailsLoaded) {
+                      final currentSerie = serieState.serieDetails;
+                      final isInWatchlist =
+                          watchlistBloc.state is WatchlistLoaded &&
+                              (watchlistBloc.state as WatchlistLoaded)
+                                  .serieIds
+                                  .contains(serieId);
+
+                      return IconButton(
+                        icon: Icon(
+                          Icons.bookmark,
+                          color: isInWatchlist ? Colors.blue : Colors.grey,
+                        ),
+                        tooltip: isInWatchlist
+                            ? 'Remove from watchlist.'
+                            : 'Add to watchlist.',
+                        onPressed: () {
+                          if (isInWatchlist) {
+                            context.read<WatchlistBloc>().add(
+                                  RemoveSerieFromWatchlist(
+                                    currentSerie,
+                                  ),
+                                );
+                          } else {
+                            context.read<WatchlistBloc>().add(
+                                  AddSerieToWatchlist(
+                                    currentSerie,
+                                  ),
+                                );
                           }
                         },
                       );

@@ -2,39 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tv_app/features/serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import 'package:tv_app/features/series/domain/usecases/get_episodes.dart';
 import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_event.dart';
-import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
+import 'package:tv_app/features/watchlist/presentation/bloc/watchlist_bloc.dart';
+import 'package:tv_app/features/watchlist/presentation/bloc/watchlist_event.dart';
+import 'package:tv_app/features/watchlist/presentation/bloc/watchlist_state.dart';
 import 'package:tv_app/injection_container.dart';
-import '../../../watchlist/presentation/bloc/watchlist_bloc.dart';
-import '../../../watchlist/presentation/bloc/watchlist_event.dart';
-import '../../../watchlist/presentation/bloc/watchlist_state.dart';
-import '../bloc/serie_favorites_bloc.dart';
+import '../../../series/presentation/pages/serie_details_page.dart';
 
-class SerieFavoritesPage extends StatefulWidget {
-  const SerieFavoritesPage({super.key});
+class WatchlistPage extends StatefulWidget {
+  const WatchlistPage({super.key});
 
   @override
-  State<SerieFavoritesPage> createState() => _SerieFavoritesPageState();
+  State<WatchlistPage> createState() => _WatchlistPageState();
 }
 
-class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
-  late SerieFavoritesBloc favoritesBloc;
+class _WatchlistPageState extends State<WatchlistPage> {
+  late WatchlistBloc watchlistBloc;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    favoritesBloc = sl<SerieFavoritesBloc>()..add(LoadSerieFavorites());
+    watchlistBloc = sl<WatchlistBloc>()..add(LoadWatchlist());
     _searchController.addListener(_onSearchChanged);
   }
 
   Future<void> _refreshData() async {
-    favoritesBloc = sl<SerieFavoritesBloc>()..add(LoadSerieFavorites());
+    watchlistBloc = sl<WatchlistBloc>()..add(LoadWatchlist());
     _searchController.addListener(_onSearchChanged);
-    context.read<SerieFavoritesBloc>().loadInitialFavorites();
+    context.read<WatchlistBloc>().add(LoadWatchlist());
     FocusScope.of(context).unfocus();
   }
 
@@ -47,7 +47,7 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
 
   void _onSearchChanged() {
     final query = _searchController.text;
-    favoritesBloc.add(SearchSerieFavorites(query));
+    watchlistBloc.add(SearchSerieInWatchlist(query));
   }
 
   @override
@@ -55,14 +55,14 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
     final di = GetIt.instance;
 
     return BlocProvider.value(
-      value: favoritesBloc,
+      value: watchlistBloc,
       child: PopScope(
         onPopInvokedWithResult: (bool didPop, dynamic result) {
-          context.read<SerieFavoritesBloc>().loadInitialFavorites();
+          context.read<WatchlistBloc>().add(LoadWatchlist());
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("Favorite Series"),
+            title: const Text("Watchlist"),
           ),
           body: RefreshIndicator(
             onRefresh: _refreshData,
@@ -74,65 +74,62 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                     controller: _searchController,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
-                      labelText: 'Search for favorite series...',
+                      labelText: 'Search for a serie in watchlist...',
                       floatingLabelStyle: const TextStyle(
                         color: Colors.black,
                       ),
                       prefixIcon: IconButton(
                         icon: const Icon(Icons.search),
                         onPressed: () {
-                          favoritesBloc.add(
-                            SearchSerieFavorites(_searchController.text.trim()),
+                          watchlistBloc.add(
+                            SearchSerieInWatchlist(
+                                _searchController.text.trim()),
                           );
-                          context
-                              .read<SerieFavoritesBloc>()
-                              .loadInitialFavorites();
+                          context.read<WatchlistBloc>().add(LoadWatchlist());
                           FocusScope.of(context).unfocus();
                         },
                       ),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          favoritesBloc.add(
-                            SearchSerieFavorites(_searchController.text = ""),
+                          watchlistBloc.add(
+                            SearchSerieInWatchlist(_searchController.text = ""),
                           );
-                          context
-                              .read<SerieFavoritesBloc>()
-                              .loadInitialFavorites();
+                          context.read<WatchlistBloc>().add(LoadWatchlist());
                           FocusScope.of(context).unfocus();
                         },
                       ),
                     ),
                     onChanged: (query) {
-                      favoritesBloc.add(
-                        SearchSerieFavorites(query.trim()),
+                      watchlistBloc.add(
+                        SearchSerieInWatchlist(query.trim()),
                       );
                     },
                     textInputAction: TextInputAction.search,
                     onSubmitted: (query) {
-                      favoritesBloc.add(
-                        SearchSerieFavorites(query.trim()),
+                      watchlistBloc.add(
+                        SearchSerieInWatchlist(query.trim()),
                       );
                     },
                   ),
                   const SizedBox(height: 8),
                   Expanded(
-                    child: BlocBuilder<SerieFavoritesBloc, SerieFavoritesState>(
+                    child: BlocBuilder<WatchlistBloc, WatchlistState>(
                       builder: (context, state) {
-                        if (state is SerieFavoritesLoading) {
+                        if (state is WatchlistLoading) {
                           return const Center(
                               child: CircularProgressIndicator());
-                        } else if (state is SerieFavoritesLoaded) {
-                          if (state.allFavorites.isEmpty) {
+                        } else if (state is WatchlistLoaded) {
+                          if (state.allWatchList.isEmpty) {
                             return const Center(
-                                child: Text("No favorites yet."));
+                                child: Text("No watchlist yet."));
                           }
                           return ListView.separated(
                             separatorBuilder: (context, index) =>
-                                const Divider(),
-                            itemCount: state.allFavorites.length,
+                            const Divider(),
+                            itemCount: state.allWatchList.length,
                             itemBuilder: (context, index) {
-                              final series = state.allFavorites[index];
+                              final series = state.allWatchList[index];
 
                               return GestureDetector(
                                 behavior: HitTestBehavior.opaque,
@@ -153,8 +150,8 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                   );
 
                                   context
-                                      .read<SerieFavoritesBloc>()
-                                      .add(LoadSerieFavorites());
+                                      .read<WatchlistBloc>()
+                                      .add(LoadWatchlist());
                                 },
                                 child: Row(
                                   children: [
@@ -162,46 +159,46 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                       height: 160,
                                       child: series.imageUrl != null
                                           ? ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(16.0),
-                                              child: Image.network(
-                                                series.imageUrl!,
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    3.9,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            )
+                                        borderRadius:
+                                        BorderRadius.circular(16.0),
+                                        child: Image.network(
+                                          series.imageUrl!,
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              3.9,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      )
                                           : ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(16.0),
-                                              child: SvgPicture.asset(
-                                                "assets/images/No-Image-Placeholder.svg",
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    3.9,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
+                                        borderRadius:
+                                        BorderRadius.circular(16.0),
+                                        child: SvgPicture.asset(
+                                          "assets/images/No-Image-Placeholder.svg",
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              3.9,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             series.name,
                                             style:
-                                                const TextStyle(fontSize: 16),
+                                            const TextStyle(fontSize: 16),
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
                                             "Rating: ${series.ratingAverage != null ? series.ratingAverage.toString() : "Rating not available."}",
                                             style:
-                                                const TextStyle(fontSize: 12),
+                                            const TextStyle(fontSize: 12),
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
@@ -209,7 +206,7 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                                 ? "${series.summary?.replaceAll(RegExp(r'<[^>]*>'), '')}"
                                                 : "Explanation not available.",
                                             style:
-                                                const TextStyle(fontSize: 12),
+                                            const TextStyle(fontSize: 12),
                                             maxLines: 4,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -219,22 +216,21 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                                 ? series.genres.join(', ')
                                                 : "No species information available.",
                                             style:
-                                                const TextStyle(fontSize: 12),
+                                            const TextStyle(fontSize: 12),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    //const SizedBox(width: 0),
                                     Column(
                                       children: [
                                         BlocBuilder<SerieFavoritesBloc,
                                             SerieFavoritesState>(
                                           builder: (context, favoriteState) {
                                             final isCurrentlyFavorited =
-                                                (favoriteState
-                                                        is SerieFavoritesLoaded &&
-                                                    favoriteState.favoriteIds
-                                                        .contains(series.id));
+                                            (favoriteState
+                                            is SerieFavoritesLoaded &&
+                                                favoriteState.favoriteIds
+                                                    .contains(series.id));
 
                                             return IconButton(
                                               icon: Icon(
@@ -244,22 +240,21 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                                     : Colors.grey,
                                               ),
                                               tooltip: isCurrentlyFavorited
-                                                  ? 'Remove to favorites'
+                                                  ? 'Remove from favorites.'
                                                   : 'Add to favorites.',
                                               onPressed: () {
                                                 if (isCurrentlyFavorited) {
-                                                  context
-                                                      .read<
-                                                          SerieFavoritesBloc>()
-                                                      .add(
-                                                          RemoveSerieFromFavorites(
-                                                              series));
+                                                  context.read<SerieFavoritesBloc>().add(
+                                                    RemoveSerieFromFavorites(
+                                                      series,
+                                                    ),
+                                                  );
                                                 } else {
-                                                  context
-                                                      .read<
-                                                          SerieFavoritesBloc>()
-                                                      .add(AddSerieToFavorites(
-                                                          series));
+                                                  context.read<SerieFavoritesBloc>().add(
+                                                    AddSerieToFavorites(
+                                                      series,
+                                                    ),
+                                                  );
                                                 }
                                               },
                                             );
@@ -269,10 +264,10 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                             WatchlistState>(
                                           builder: (context, watchlistState) {
                                             final isCurrentlyInWatchlist =
-                                                (watchlistState
-                                                        is WatchlistLoaded &&
-                                                    watchlistState.serieIds
-                                                        .contains(series.id));
+                                            (watchlistState
+                                            is WatchlistLoaded &&
+                                                watchlistState.serieIds
+                                                    .contains(series.id));
 
                                             return IconButton(
                                               icon: Icon(
@@ -289,18 +284,18 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                                   context
                                                       .read<WatchlistBloc>()
                                                       .add(
-                                                        RemoveSerieFromWatchlist(
-                                                          series,
-                                                        ),
-                                                      );
+                                                    RemoveSerieFromWatchlist(
+                                                      series,
+                                                    ),
+                                                  );
                                                 } else {
                                                   context
                                                       .read<WatchlistBloc>()
                                                       .add(
-                                                        AddSerieToWatchlist(
-                                                          series,
-                                                        ),
-                                                      );
+                                                    AddSerieToWatchlist(
+                                                      series,
+                                                    ),
+                                                  );
                                                 }
                                               },
                                             );
@@ -313,11 +308,11 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                               );
                             },
                           );
-                        } else if (state is SerieFavoritesError) {
+                        } else if (state is WatchlistError) {
                           return Center(child: Text(state.message));
                         }
                         return const Center(
-                          child: Text("Favorite series could not be loaded."),
+                          child: Text("Watchlist could not be loaded."),
                         );
                       },
                     ),

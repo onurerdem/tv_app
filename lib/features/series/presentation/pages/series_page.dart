@@ -5,6 +5,10 @@ import 'package:get_it/get_it.dart';
 import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
 import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
 import '../../../serie_favorites/presentation/pages/serie_favorites_page.dart';
+import '../../../watchlist/presentation/bloc/watchlist_bloc.dart';
+import '../../../watchlist/presentation/bloc/watchlist_event.dart';
+import '../../../watchlist/presentation/bloc/watchlist_state.dart';
+import '../../../watchlist/presentation/pages/watchlist_page.dart';
 import '../../domain/usecases/get_episodes.dart';
 import '../../domain/usecases/get_serie_details.dart';
 import '../bloc/serie_details_bloc.dart';
@@ -54,6 +58,7 @@ class _SeriesPageState extends State<SeriesPage> {
     final bloc = context.read<SeriesBloc>();
     final di = GetIt.instance;
     final favoritesBloc = context.read<SerieFavoritesBloc>();
+    final watchlistBloc = context.read<WatchlistBloc>();
 
     return PopScope(
       canPop: false,
@@ -80,6 +85,25 @@ class _SeriesPageState extends State<SeriesPage> {
                       value: context.read<SerieFavoritesBloc>()
                         ..add(LoadSerieFavorites()),
                       child: const SerieFavoritesPage(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.bookmark,
+                color: Colors.blue,
+              ),
+              tooltip: 'View watchlist.',
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (newContext) => BlocProvider.value(
+                      value: context.read<WatchlistBloc>()
+                        ..add(LoadWatchlist()),
+                      child: const WatchlistPage(),
                     ),
                   ),
                 );
@@ -234,35 +258,83 @@ class _SeriesPageState extends State<SeriesPage> {
                                       ],
                                     ),
                                   ),
-                                  BlocBuilder<SerieFavoritesBloc,
-                                      SerieFavoritesState>(
-                                    builder: (context, favoriteState) {
-                                      final isCurrentlyFavorited = (favoriteState
-                                      is SerieFavoritesLoaded &&
-                                          favoriteState.favoriteIds
-                                              .contains(series.id));
+                                  Column(
+                                    children: [
+                                      BlocBuilder<SerieFavoritesBloc,
+                                          SerieFavoritesState>(
+                                        builder: (context, favoriteState) {
+                                          final isCurrentlyFavorited =
+                                              (favoriteState
+                                                      is SerieFavoritesLoaded &&
+                                                  favoriteState.favoriteIds
+                                                      .contains(series.id));
 
-                                      return IconButton(
-                                        icon: Icon(
-                                          Icons.favorite,
-                                          color: isCurrentlyFavorited
-                                              ? Colors.red
-                                              : Colors.grey,
-                                        ),
-                                        tooltip: isCurrentlyFavorited
-                                            ? 'Remove to favorites'
-                                            : 'Add to favorites.',
-                                        onPressed: () {
-                                          if (isCurrentlyFavorited) {
-                                            favoritesBloc.add(
-                                                RemoveSerieFromFavorites(series));
-                                          } else {
-                                            favoritesBloc
-                                                .add(AddSerieToFavorites(series));
-                                          }
+                                          return IconButton(
+                                            icon: Icon(
+                                              Icons.favorite,
+                                              color: isCurrentlyFavorited
+                                                  ? Colors.red
+                                                  : Colors.grey,
+                                            ),
+                                            tooltip: isCurrentlyFavorited
+                                                ? 'Remove to favorites'
+                                                : 'Add to favorites.',
+                                            onPressed: () {
+                                              if (isCurrentlyFavorited) {
+                                                favoritesBloc.add(
+                                                    RemoveSerieFromFavorites(
+                                                        series));
+                                              } else {
+                                                favoritesBloc.add(
+                                                    AddSerieToFavorites(
+                                                        series));
+                                              }
+                                            },
+                                          );
                                         },
-                                      );
-                                    },
+                                      ),
+                                      BlocBuilder<WatchlistBloc,
+                                          WatchlistState>(
+                                        builder: (
+                                          context,
+                                          watchlistState,
+                                        ) {
+                                          final isInWatchlist = watchlistBloc
+                                                  .state is WatchlistLoaded &&
+                                              (watchlistBloc.state
+                                                      as WatchlistLoaded)
+                                                  .serieIds
+                                                  .contains(series.id);
+
+                                          return IconButton(
+                                            icon: Icon(
+                                              Icons.bookmark,
+                                              color: isInWatchlist
+                                                  ? Colors.blue
+                                                  : Colors.grey,
+                                            ),
+                                            tooltip: isInWatchlist
+                                                ? 'Remove from watchlist.'
+                                                : 'Add to watchlist.',
+                                            onPressed: () {
+                                              if (isInWatchlist) {
+                                                watchlistBloc.add(
+                                                  RemoveSerieFromWatchlist(
+                                                    series,
+                                                  ),
+                                                );
+                                              } else {
+                                                watchlistBloc.add(
+                                                  AddSerieToWatchlist(
+                                                    series,
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
