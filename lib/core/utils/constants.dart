@@ -13,3 +13,5 @@ const USERS = "Users";
 const FAVORITE_SERIES = "Favorite Series";
 const FAVORITE_ACTORS = "Favorite Actors";
 const WATCHLIST = "Watchlist";
+const WATCHED = "Watched";
+const EPISODES = "Episodes";
