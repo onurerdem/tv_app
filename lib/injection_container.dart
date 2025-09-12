@@ -75,6 +75,8 @@ import 'features/watched/domain/usecases/mark_episodes_watched.dart';
 import 'features/watched/domain/usecases/remove_watched_episode.dart';
 import 'features/watched/domain/usecases/remove_watched_episodes.dart';
 import 'features/watched/domain/usecases/remove_watched_series.dart';
+import 'features/watched/presentation/bloc/watched_bloc.dart';
+import 'features/watched/presentation/bloc/watched_event.dart';
 import 'features/watchlist/data/datasources/remote/watchlist_remote_data_source_impl.dart';
 import 'features/watchlist/data/datasources/watchlist_remote_data_source.dart';
 import 'features/watchlist/data/repositories/watchlist_repository_impl.dart';
@@ -394,6 +396,20 @@ Future<void> init() async {
   );
   sl.registerLazySingleton(
     () => RemoveWatchedEpisode(sl<WatchedRepository>()),
+  );
+
+  sl.registerFactory(
+        () => WatchedBloc(
+      sl<GetWatchedSeries>(),
+      sl<GetWatchedEpisodes>(),
+      sl<AddWatchedSeries>(),
+      sl<RemoveWatchedSeries>(),
+      sl<SetEpisodesWatched>(),
+      sl<MarkEpisodesWatched>(),
+      sl<RemoveWatchedEpisodes>(),
+      sl<RemoveWatchedEpisode>(),
+      FirebaseAuth.instance.currentUser!.uid,
+    )..add(LoadWatchedSeries()),
   );
 }
 
