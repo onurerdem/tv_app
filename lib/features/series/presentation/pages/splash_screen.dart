@@ -1,77 +1,111 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
-
-import '../../../navigation/presentation/bloc/navigation_bloc.dart';
-import '../../../navigation/presentation/pages/main_page.dart';
-import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    _navigateToNextScreen();
+    WidgetsBinding.instance.addObserver(this);
+    _startUp();
   }
 
-  void _navigateToNextScreen() async {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _startUp();
+    }
+  }
+
+  Future<void> _startUp() async {
     await Future.delayed(const Duration(seconds: 3));
 
     final prefs = await SharedPreferences.getInstance();
-    final onboardingCompleted = prefs.getBool('onboardingCompleted') ?? false;
-
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    final isSignedInWithFirebase = firebaseUser != null;
-
-    if (onboardingCompleted) {
-      if (isSignedInWithFirebase) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => BlocProvider.value(
-              value: BlocProvider.of<NavigationBloc>(context),
-              child: MainPage(),
-            ),
-          ),
-        );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SignInPage(),
-          ),
-        );
-      }
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingScreen(),
-        ),
-      );
+    final onboarded = prefs.getBool('onboardingCompleted') ?? false;
+    if (!onboarded) {
+      Navigator.of(context).pushReplacementNamed('/onboard');
+      return;
     }
+
+    final user = FirebaseAuth.instance.currentUser;
+    if (kDebugMode) {
+      print("User: $user");
+    }
+    if (user == null) {
+      Navigator.of(context).pushReplacementNamed('/signIn');
+      return;
+    }
+
+    try {
+      final idTokenResult = await user.getIdTokenResult();
+      if (kDebugMode) {
+        print("idTokenResult: $idTokenResult");
+      }
+      final exp = idTokenResult.expirationTime;
+      if (kDebugMode) {
+        print("Exp: $exp");
+      }
+      if (kDebugMode) {
+        print("exp.isBefore(DateTime.now()): ${exp?.isBefore(DateTime.now())}");
+      }
+      if (kDebugMode) {
+        print("DateTime.now(): ${DateTime.now()}");
+      }
+      if (kDebugMode) {
+        print(
+            "DateTime.now().add(const Duration(hours: -3)): ${DateTime.now().add(const Duration(hours: -3))}");
+      }
+      if (kDebugMode) {
+        print("user.metadata.lastSignInTime: ${user.metadata.lastSignInTime}");
+      }
+      if (kDebugMode) {
+        print(
+            "user.metadata.lastSignInTime?.add(const Duration(hours: 1)): ${user.metadata.lastSignInTime?.add(const Duration(hours: 1))}");
+      }
+      if (kDebugMode) {
+        print(
+            "exp?.isBefore(user.metadata.lastSignInTime!.add(const Duration(hours: 1))): ${exp?.isBefore(user.metadata.lastSignInTime!.add(const Duration(hours: 1)))}");
+      }
+      if (exp == null || exp.isBefore(DateTime.now())) {
+        await FirebaseAuth.instance.signOut();
+        Navigator.of(context).pushReplacementNamed('/signIn');
+        return;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error: $e");
+      }
+      await FirebaseAuth.instance.signOut();
+      Navigator.of(context).pushReplacementNamed('/signIn');
+      return;
+    }
+
+    Navigator.of(context).pushReplacementNamed('/main');
+
+    if (kDebugMode) {
+      print("SplashScreen const MainPage(), ********************************");
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.white,
-        child: Center(
-          child: Lottie.asset(
-            "assets/animations/tv_animation.json",
-          ),
-        ),
-      ),
+      body: Center(child: Lottie.asset("assets/animations/tv_animation.json")),
     );
   }
 }

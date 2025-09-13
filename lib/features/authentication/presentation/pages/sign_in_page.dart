@@ -1,10 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_up_page.dart';
-
-import '../../../navigation/presentation/bloc/navigation_bloc.dart';
-import '../../../navigation/presentation/pages/main_page.dart';
+import 'package:tv_app/features/authentication/presentation/pages/verify_email_page.dart';
 import '../../../series/presentation/widgets/show_exit_dialog.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/authentication/authentication_cubit.dart';
@@ -21,11 +20,11 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   final TextEditingController _usernameOrEmailController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   final GlobalKey<ScaffoldState> _scaffoldGlobalKey =
-      GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState>();
 
   bool _isPasswordObscured = true;
 
@@ -49,35 +48,46 @@ class _SignInPageState extends State<SignInPage> {
       },
       child: Scaffold(
         key: _scaffoldGlobalKey,
-        body: BlocConsumer<UserCubit, UserState>(
-          builder: (context, userState) {
-            if (userState is UserSuccess) {
-              return BlocBuilder<AuthenticationCubit, AuthenticationState>(
-                  builder: (context, authenticationState) {
-                if (authenticationState is Authenticated) {
-                  return BlocProvider.value(
-                    value: BlocProvider.of<NavigationBloc>(context),
-                    child: MainPage(),
-                  );
-                } else {
-                  return _bodyWidget();
-                }
-              });
+        body: BlocListener<UserCubit, UserState>(
+          listenWhen: (prev, curr) {
+            if (prev is EmailVerificationRequired &&
+                curr is EmailVerificationRequired) {
+              return false;
             }
-
-            return _bodyWidget();
+            return curr is EmailVerificationRequired ||
+                curr is UserSuccess ||
+                curr is UserFailure;
           },
           listener: (context, userState) {
-            if (userState is UserSuccess) {
+            if (userState is EmailVerificationRequired) {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => VerifyEmailPage()));
+            } else if (userState is UserSuccess) {
               BlocProvider.of<AuthenticationCubit>(context).loggedIn();
-            }
-            if (userState is UserFailure) {
+
+              if (kDebugMode) {
+                print(
+                    "BlocProvider.of<AuthenticationCubit>(context).loggedIn(); **********************************************");
+              }
+            } else if (userState is UserFailure) {
               snackBarError(
                 msg: "The email/the username\nor password is incorrect.",
                 scaffoldState: _scaffoldGlobalKey,
               );
             }
           },
+          child: BlocListener<AuthenticationCubit, AuthenticationState>(
+            listenWhen: (p, c) => c is Authenticated,
+            listener: (context, state) {
+              Navigator.of(context).pushNamedAndRemoveUntil('/main', (route) => false);
+
+              if (kDebugMode) {
+                print(
+                    "SingInPage const MainPage(), **********************************************");
+              }
+            },
+            child: _bodyWidget(),
+          ),
         ),
       ),
     );
@@ -138,10 +148,14 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordObscured ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordObscured
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Colors.grey.shade600,
                       ),
-                      tooltip: _isPasswordObscured ? 'Show password' : 'Hide password',
+                      tooltip: _isPasswordObscured
+                          ? 'Show password'
+                          : 'Hide password',
                       onPressed: () {
                         setState(() {
                           _isPasswordObscured = !_isPasswordObscured;

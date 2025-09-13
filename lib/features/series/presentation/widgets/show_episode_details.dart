@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tv_app/features/series/domain/entities/episode.dart';
 import 'package:tv_app/features/series/presentation/widgets/episode_detail_sheet_content.dart';
+import '../../domain/entities/series.dart';
 
-void showEpisodeDetails(BuildContext context, Episode episode) {
+void showEpisodeDetails(BuildContext context, Episode episode, Series serie) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -25,6 +26,7 @@ void showEpisodeDetails(BuildContext context, Episode episode) {
             onTap: () {},
             child: EpisodeDetailSheetContent(
               episode: episode,
+              serie: serie,
               scrollController: scrollController,
             ),
           );

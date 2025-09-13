@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:tv_app/core/utils/constants.dart';
@@ -8,6 +9,9 @@ import 'package:tv_app/features/series/data/datasources/remote/series_remote_dat
 import 'package:tv_app/features/series/domain/usecases/get_all_series.dart';
 import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
 import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
+import 'package:tv_app/features/watched/data/datasources/watched_remote_data_source.dart';
+import 'package:tv_app/features/watched/domain/usecases/add_watched_episode.dart';
+import 'package:tv_app/features/watched/domain/usecases/get_watched_episodes.dart';
 import 'features/actors/data/datasources/actors_remote_data_source.dart';
 import 'features/actors/data/datasources/remote/actors_remote_data_source_impl.dart';
 import 'features/actors/data/repositories/actors_repository_impl.dart';
@@ -62,6 +66,17 @@ import 'features/series/domain/usecases/get_series_by_page.dart';
 import 'features/series/domain/usecases/search_series.dart';
 import 'core/network/api_client.dart';
 import 'features/series/presentation/bloc/series_bloc.dart';
+import 'features/watched/data/datasources/remote/watched_remote_data_source_impl.dart';
+import 'features/watched/data/repositories/watched_repository_impl.dart';
+import 'features/watched/domain/repositories/watched_repository.dart';
+import 'features/watched/domain/usecases/add_watched_series.dart';
+import 'features/watched/domain/usecases/get_watched_series.dart';
+import 'features/watched/domain/usecases/mark_episodes_watched.dart';
+import 'features/watched/domain/usecases/remove_watched_episode.dart';
+import 'features/watched/domain/usecases/remove_watched_episodes.dart';
+import 'features/watched/domain/usecases/remove_watched_series.dart';
+import 'features/watched/presentation/bloc/watched_bloc.dart';
+import 'features/watched/presentation/bloc/watched_event.dart';
 import 'features/watchlist/data/datasources/remote/watchlist_remote_data_source_impl.dart';
 import 'features/watchlist/data/datasources/watchlist_remote_data_source.dart';
 import 'features/watchlist/data/repositories/watchlist_repository_impl.dart';
@@ -75,13 +90,9 @@ import 'features/watchlist/presentation/bloc/watchlist_event.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
-  sl.registerLazySingleton(
-    () {
-      final dio = Dio();
-      dio.options.baseUrl = BASE_URL;
-      return dio;
-    },
-  );
+  final dio = Dio(BaseOptions(baseUrl: BASE_URL));
+  dio.interceptors.add(AuthInterceptor());
+  sl.registerLazySingleton(() => dio);
 
   sl.registerLazySingleton(() => ApiClient(sl<Dio>()));
 
@@ -312,7 +323,7 @@ Future<void> init() async {
   );
 
   sl.registerFactory(
-        () => FavoriteActorsBloc(
+    () => FavoriteActorsBloc(
       sl<GetFavoriteActors>(),
       sl<GetActorDetailsUseCase>(),
       sl<AddActorToFavorites>(),
@@ -321,7 +332,7 @@ Future<void> init() async {
   );
 
   sl.registerLazySingleton<WatchlistRemoteDataSource>(
-        () => WatchlistRemoteDataSourceImpl(
+    () => WatchlistRemoteDataSourceImpl(
       sl<FirebaseAuth>(),
       sl<FirebaseFirestore>(),
       sl<ApiClient>(),
@@ -329,21 +340,94 @@ Future<void> init() async {
   );
 
   sl.registerLazySingleton<WatchlistRepository>(
-        () => WatchlistRepositoryImpl(
+    () => WatchlistRepositoryImpl(
       sl<WatchlistRemoteDataSource>(),
     ),
   );
 
   sl.registerLazySingleton(() => AddToWatchlist(sl<WatchlistRepository>()));
   sl.registerLazySingleton(
-          () => RemoveFromWatchlist(sl<WatchlistRepository>()));
+    () => RemoveFromWatchlist(
+      sl<WatchlistRepository>(),
+    ),
+  );
   sl.registerLazySingleton(() => GetWatchlist(sl<WatchlistRepository>()));
 
   sl.registerFactory(
-        () => WatchlistBloc(
+    () => WatchlistBloc(
       sl<GetWatchlist>(),
       sl<AddToWatchlist>(),
       sl<RemoveFromWatchlist>(),
     )..add(LoadWatchlist()),
   );
+
+  sl.registerLazySingleton<WatchedRemoteDataSource>(
+    () => WatchedRemoteDataSourceImpl(
+      sl<FirebaseAuth>(),
+      sl<FirebaseFirestore>(),
+      sl<ApiClient>(),
+    ),
+  );
+  sl.registerLazySingleton<WatchedRepository>(
+    () => WatchedRepositoryImpl(
+      sl<WatchedRemoteDataSource>(),
+    ),
+  );
+  sl.registerLazySingleton(
+    () => AddWatchedSeries(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RemoveWatchedSeries(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetWatchedSeries(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => GetWatchedEpisodes(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => SetEpisodesWatched(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => MarkEpisodesWatched(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RemoveWatchedEpisodes(sl<WatchedRepository>()),
+  );
+  sl.registerLazySingleton(
+    () => RemoveWatchedEpisode(sl<WatchedRepository>()),
+  );
+
+  sl.registerFactory(
+        () => WatchedBloc(
+      sl<GetWatchedSeries>(),
+      sl<GetWatchedEpisodes>(),
+      sl<AddWatchedSeries>(),
+      sl<RemoveWatchedSeries>(),
+      sl<SetEpisodesWatched>(),
+      sl<MarkEpisodesWatched>(),
+      sl<RemoveWatchedEpisodes>(),
+      sl<RemoveWatchedEpisode>(),
+      FirebaseAuth.instance.currentUser!.uid,
+    )..add(LoadWatchedSeries()),
+  );
+}
+
+class AuthInterceptor extends Interceptor {
+  @override
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final token = await user.getIdToken(false);
+        if (token != null) {
+          options.headers['Authorization'] = 'Bearer $token';
+        }
+      }
+    } catch (e) {
+      debugPrint('AuthInterceptor token error: $e');
+    }
+    handler.next(options);
+  }
 }

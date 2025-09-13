@@ -1,12 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_app/features/authentication/presentation/cubit/authentication/authentication_cubit.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
-
+import 'package:tv_app/features/authentication/presentation/pages/verify_email_page.dart';
 import '../../../navigation/presentation/bloc/navigation_bloc.dart';
 import '../../../navigation/presentation/pages/main_page.dart';
 import '../../domain/entities/user_entity.dart';
 import '../cubit/user/user_cubit.dart';
+import '../widgets/snack_bar.dart';
 import '../widgets/snack_bar_error.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -20,7 +22,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+  TextEditingController();
 
   final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
 
@@ -42,12 +45,19 @@ class _SignUpPageState extends State<SignUpPage> {
       key: _globalKey,
       body: BlocConsumer<UserCubit, UserState>(
         builder: (context, userState) {
+          if (userState is EmailVerificationRequired) {
+            if (kDebugMode) {
+              print("return VerifyEmailPage(); **************************************************");
+            }
+            return VerifyEmailPage();
+          }
+
           if (userState is UserSuccess) {
             return BlocBuilder<AuthenticationCubit, AuthenticationState>(
-              builder: (context, authenticationState) {
+              builder: (context2, authenticationState) {
                 if (authenticationState is Authenticated) {
                   return BlocProvider.value(
-                    value: BlocProvider.of<NavigationBloc>(context),
+                    value: BlocProvider.of<NavigationBloc>(context2),
                     child: MainPage(),
                   );
                 } else {
@@ -59,10 +69,15 @@ class _SignUpPageState extends State<SignUpPage> {
 
           return _bodyWidget();
         },
-        listener: (context, userState) {
-          if (userState is UserSuccess) {
-            BlocProvider.of<AuthenticationCubit>(context).loggedIn();
+        listenWhen: (prev, curr) {
+          if (prev is EmailVerificationRequired && curr is UserFailure) {
+            return false;
           }
+          return curr is UserFailure ||
+              curr is UserEmailAlreadyExists ||
+              curr is UserUsernameAlreadyExists;
+        },
+        listener: (context, userState) {
           if (userState is UserFailure) {
             snackBarError(
               msg: "The email or password is incorrect.",
@@ -71,13 +86,15 @@ class _SignUpPageState extends State<SignUpPage> {
           }
           if (userState is UserEmailAlreadyExists) {
             snackBarError(
-              msg: "This email address is already registered.\nPlease use a different email address.",
+              msg:
+              "This email address is already registered.\nPlease use a different email address.",
               scaffoldState: _globalKey,
             );
           }
           if (userState is UserUsernameAlreadyExists) {
             snackBarError(
-              msg: "This username is already taken.\nPlease choose a different username.",
+              msg:
+              "This username is already taken.\nPlease choose a different username.",
               scaffoldState: _globalKey,
             );
           }
@@ -109,7 +126,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: Colors.black.withValues(alpha: 0.6)),
+                    border:
+                    Border.all(color: Colors.black.withValues(alpha: 0.6)),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.arrow_back_ios),
@@ -175,10 +193,14 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isPasswordObscured ? Icons.visibility : Icons.visibility_off,
+                        _isPasswordObscured
+                            ? Icons.visibility
+                            : Icons.visibility_off,
                         color: Colors.grey.shade600,
                       ),
-                      tooltip: _isPasswordObscured ? 'Show password' : 'Hide password',
+                      tooltip: _isPasswordObscured
+                          ? 'Show password'
+                          : 'Hide password',
                       onPressed: () {
                         setState(() {
                           _isPasswordObscured = !_isPasswordObscured;
@@ -208,13 +230,18 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _isConfirmPasswordObscured ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+                        _isConfirmPasswordObscured
+                            ? Icons.visibility_outlined
+                            : Icons.visibility_off_outlined,
                         color: Colors.grey.shade600,
                       ),
-                      tooltip: _isConfirmPasswordObscured ? 'Show password' : 'Hide password',
+                      tooltip: _isConfirmPasswordObscured
+                          ? 'Show password'
+                          : 'Hide password',
                       onPressed: () {
                         setState(() {
-                          _isConfirmPasswordObscured = !_isConfirmPasswordObscured;
+                          _isConfirmPasswordObscured =
+                          !_isConfirmPasswordObscured;
                         });
                       },
                     ),
@@ -298,9 +325,11 @@ class _SignUpPageState extends State<SignUpPage> {
         msg: "The password is empty!",
         scaffoldState: _globalKey,
       );
-    } else if (_passwordController.text.length < 6 || _passwordController.text.length > 15) {
+    } else if (_passwordController.text.length < 6 ||
+        _passwordController.text.length > 15) {
       snackBarError(
-        msg: "Your password can not have less than\n6 characters or more than 15 characters!",
+        msg:
+        "Your password can not have less than\n6 characters or more than 15 characters!",
         scaffoldState: _globalKey,
       );
     } else if (_confirmPasswordController.text.isEmpty) {
@@ -308,9 +337,11 @@ class _SignUpPageState extends State<SignUpPage> {
         msg: "The password repeat field is empty!",
         scaffoldState: _globalKey,
       );
-    } else if (_confirmPasswordController.text.length < 6 || _confirmPasswordController.text.length > 15) {
+    } else if (_confirmPasswordController.text.length < 6 ||
+        _confirmPasswordController.text.length > 15) {
       snackBarError(
-        msg: "Password repetition cannot be less than\n6 characters or more than 15 characters!",
+        msg:
+        "Password repetition cannot be less than\n6 characters or more than 15 characters!",
         scaffoldState: _globalKey,
       );
     } else if (_passwordController.text != _confirmPasswordController.text) {
@@ -325,6 +356,11 @@ class _SignUpPageState extends State<SignUpPage> {
           email: _emailController.text,
           password: _passwordController.text,
         ),
+      );
+      snackBar(
+        msg:
+        "A verification email has been sent to\n${_emailController.text}.\nPlease check your inbox.",
+        scaffoldState: _globalKey,
       );
     }
   }

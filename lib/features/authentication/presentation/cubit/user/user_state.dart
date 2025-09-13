@@ -34,6 +34,46 @@ class UserUsernameAlreadyExists extends UserState {
   List<Object> get props => [];
 }
 
+class EmailVerificationRequired extends UserState {
+  @override
+  List<Object?> get props => [];
+}
+
+class UserVerificationFailed extends UserState {
+  final DateTime timestamp; // new
+  const UserVerificationFailed(this.timestamp);
+  @override
+  List<Object?> get props => [timestamp];
+}
+
+class UserIsNull extends UserState {
+  final DateTime timestamp;
+  const UserIsNull(this.timestamp);
+  @override
+  List<Object> get props => [timestamp];
+}
+
+class ResendEmailVerificationSuccess extends UserState {
+  final DateTime timestamp;
+  const ResendEmailVerificationSuccess(this.timestamp);
+  @override
+  List<Object?> get props => [timestamp];
+}
+
+class ResendEmailVerificationFailure extends UserState {
+  final DateTime timestamp;
+  const ResendEmailVerificationFailure(this.timestamp);
+  @override
+  List<Object> get props => [timestamp];
+}
+
+class TooManyRequests extends UserState {
+  final DateTime timestamp;
+  const TooManyRequests(this.timestamp);
+  @override
+  List<Object?> get props => [timestamp];
+}
+
 class ForgotPasswordLoading extends UserState {
   @override
   List<Object> get props => [];
