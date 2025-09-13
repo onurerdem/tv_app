@@ -1,13 +1,24 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tv_app/features/series/domain/entities/episode.dart';
+import '../../../watched/presentation/bloc/watched_bloc.dart';
+import '../../../watched/presentation/bloc/watched_event.dart';
+import '../../../watched/presentation/bloc/watched_state.dart';
+import '../../domain/entities/series.dart';
 
 class EpisodeDetailSheetContent extends StatelessWidget {
   final Episode episode;
+  final Series serie;
   final ScrollController scrollController;
 
-  const EpisodeDetailSheetContent({super.key, required this.episode, required this.scrollController});
+  const EpisodeDetailSheetContent({
+    super.key,
+    required this.episode,
+    required this.serie,
+    required this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -52,33 +63,70 @@ class EpisodeDetailSheetContent extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (episode.imageUrl != null)
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
-                            child: CachedNetworkImage(
-                              imageUrl: episode.imageUrl!,
-                              width: MediaQuery.of(context).size.width / 1.5,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Container(
-                                width: MediaQuery.of(context).size.width / 2,
-                                height: 200,
-                                color: Colors.grey[300],
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2.0,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                                width: MediaQuery.of(context).size.width / 20),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16.0),
+                              child: CachedNetworkImage(
+                                imageUrl: episode.imageUrl!,
+                                width: MediaQuery.of(context).size.width / 1.5,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  width: MediaQuery.of(context).size.width / 2,
+                                  height: 200,
+                                  color: Colors.grey[300],
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => ClipRRect(
+                                  borderRadius: BorderRadius.circular(16.0),
+                                  child: SvgPicture.asset(
+                                    "assets/images/No-Image-Placeholder.svg",
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
-                              errorWidget: (context, url, error) => ClipRRect(
-                                borderRadius: BorderRadius.circular(16.0),
-                                child: SvgPicture.asset(
-                                  "assets/images/No-Image-Placeholder.svg",
-                                  width: MediaQuery.of(context).size.width / 2,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
                             ),
-                          ),
+                            SizedBox(width: 8),
+                            BlocSelector<WatchedBloc, WatchedState, bool>(
+                              selector: (watchedState) {
+                                if (watchedState is WatchedLoaded) {
+                                  return watchedState
+                                          .watchedEpisodesMap[episode.id] ??
+                                      false;
+                                }
+                                return false;
+                              },
+                              builder: (context, isWatched) {
+                                return IconButton(
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color:
+                                        isWatched ? Colors.green : Colors.grey,
+                                  ),
+                                  tooltip: isWatched
+                                      ? 'Unmark episode as watched'
+                                      : 'Mark episode as watched',
+                                  onPressed: () {
+                                    context.read<WatchedBloc>().add(
+                                          ToggleEpisodeWatched(
+                                            serie.id,
+                                            episode.id,
+                                          ),
+                                        );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         )
                       else
                         Center(

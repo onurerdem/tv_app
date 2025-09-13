@@ -2,42 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get_it/get_it.dart';
-import 'package:tv_app/features/series/domain/usecases/get_episodes.dart';
-import 'package:tv_app/features/series/domain/usecases/get_serie_details.dart';
-import 'package:tv_app/features/series/presentation/bloc/serie_details_bloc.dart';
-import 'package:tv_app/features/series/presentation/bloc/serie_details_event.dart';
-import 'package:tv_app/features/series/presentation/pages/serie_details_page.dart';
-import 'package:tv_app/injection_container.dart';
-import '../../../watched/presentation/bloc/watched_bloc.dart';
-import '../../../watched/presentation/bloc/watched_event.dart';
-import '../../../watched/presentation/bloc/watched_state.dart';
+import 'package:tv_app/features/watched/presentation/bloc/watched_event.dart';
+import '../../../../injection_container.dart';
+import '../../../serie_favorites/presentation/bloc/serie_favorites_bloc.dart';
+import '../../../series/domain/usecases/get_episodes.dart';
+import '../../../series/domain/usecases/get_serie_details.dart';
+import '../../../series/presentation/bloc/serie_details_bloc.dart';
+import '../../../series/presentation/bloc/serie_details_event.dart';
+import '../../../series/presentation/pages/serie_details_page.dart';
 import '../../../watchlist/presentation/bloc/watchlist_bloc.dart';
 import '../../../watchlist/presentation/bloc/watchlist_event.dart';
 import '../../../watchlist/presentation/bloc/watchlist_state.dart';
-import '../bloc/serie_favorites_bloc.dart';
+import '../bloc/watched_bloc.dart';
+import '../bloc/watched_state.dart';
+import '../widgets/show_watched_dialog.dart';
 
-class SerieFavoritesPage extends StatefulWidget {
-  const SerieFavoritesPage({super.key});
+class WatchedPage extends StatefulWidget {
+  const WatchedPage({super.key});
 
   @override
-  State<SerieFavoritesPage> createState() => _SerieFavoritesPageState();
+  State<WatchedPage> createState() => _WatchedPageState();
 }
 
-class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
-  late SerieFavoritesBloc favoritesBloc;
+class _WatchedPageState extends State<WatchedPage> {
+  late WatchedBloc watchedBloc;
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    favoritesBloc = sl<SerieFavoritesBloc>()..add(LoadSerieFavorites());
+    watchedBloc = sl<WatchedBloc>()..add(LoadWatchedSeries());
     _searchController.addListener(_onSearchChanged);
   }
 
   Future<void> _refreshData() async {
-    favoritesBloc = sl<SerieFavoritesBloc>()..add(LoadSerieFavorites());
+    watchedBloc = sl<WatchedBloc>()..add(LoadWatchedSeries());
     _searchController.addListener(_onSearchChanged);
-    context.read<SerieFavoritesBloc>().loadInitialFavorites();
+    context.read<WatchedBloc>().add(LoadWatchedSeries());
     FocusScope.of(context).unfocus();
   }
 
@@ -50,21 +51,22 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
 
   void _onSearchChanged() {
     final query = _searchController.text;
-    favoritesBloc.add(SearchSerieFavorites(query));
+    watchedBloc.add(SearchSerieInWatchedSeries(query));
   }
 
   @override
   Widget build(BuildContext context) {
     final di = GetIt.instance;
+
     return BlocProvider.value(
-      value: favoritesBloc,
+      value: watchedBloc,
       child: PopScope(
         onPopInvokedWithResult: (bool didPop, dynamic result) {
-          context.read<SerieFavoritesBloc>().loadInitialFavorites();
+          context.read<WatchedBloc>().add(LoadWatchedSeries());
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text("Favorite Series"),
+            title: const Text("Watched Series"),
           ),
           body: RefreshIndicator(
             onRefresh: _refreshData,
@@ -76,65 +78,63 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                     controller: _searchController,
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
-                      labelText: 'Search for favorite series...',
+                      labelText: 'Search for a serie in watched series...',
                       floatingLabelStyle: const TextStyle(
                         color: Colors.black,
                       ),
                       prefixIcon: IconButton(
                         icon: const Icon(Icons.search),
                         onPressed: () {
-                          favoritesBloc.add(
-                            SearchSerieFavorites(_searchController.text.trim()),
+                          watchedBloc.add(
+                            SearchSerieInWatchedSeries(
+                                _searchController.text.trim()),
                           );
-                          context
-                              .read<SerieFavoritesBloc>()
-                              .loadInitialFavorites();
+                          context.read<WatchedBloc>().add(LoadWatchedSeries());
                           FocusScope.of(context).unfocus();
                         },
                       ),
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.close),
                         onPressed: () {
-                          favoritesBloc.add(
-                            SearchSerieFavorites(_searchController.text = ""),
+                          watchedBloc.add(
+                            SearchSerieInWatchedSeries(
+                                _searchController.text = ""),
                           );
-                          context
-                              .read<SerieFavoritesBloc>()
-                              .loadInitialFavorites();
+                          context.read<WatchedBloc>().add(LoadWatchedSeries());
                           FocusScope.of(context).unfocus();
                         },
                       ),
                     ),
                     onChanged: (query) {
-                      favoritesBloc.add(
-                        SearchSerieFavorites(query.trim()),
+                      watchedBloc.add(
+                        SearchSerieInWatchedSeries(query.trim()),
                       );
                     },
                     textInputAction: TextInputAction.search,
                     onSubmitted: (query) {
-                      favoritesBloc.add(
-                        SearchSerieFavorites(query.trim()),
+                      watchedBloc.add(
+                        SearchSerieInWatchedSeries(query.trim()),
                       );
                     },
                   ),
                   const SizedBox(height: 8),
                   Expanded(
-                    child: BlocBuilder<SerieFavoritesBloc, SerieFavoritesState>(
+                    child: BlocBuilder<WatchedBloc, WatchedState>(
                       builder: (context, state) {
-                        if (state is SerieFavoritesLoading) {
+                        if (state is WatchedLoading) {
                           return const Center(
                               child: CircularProgressIndicator());
-                        } else if (state is SerieFavoritesLoaded) {
-                          if (state.allFavorites.isEmpty) {
+                        } else if (state is WatchedLoaded) {
+                          if (state.allWatchedSeries.isEmpty) {
                             return const Center(
-                                child: Text("No favorites yet."));
+                                child: Text("No watched series yet."));
                           }
                           return ListView.separated(
                             separatorBuilder: (context, index) =>
                                 const Divider(),
-                            itemCount: state.allFavorites.length,
+                            itemCount: state.allWatchedSeries.length,
                             itemBuilder: (context, index) {
-                              final series = state.allFavorites[index];
+                              final series = state.allWatchedSeries[index];
 
                               return GestureDetector(
                                 behavior: HitTestBehavior.opaque,
@@ -155,8 +155,8 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                   );
 
                                   context
-                                      .read<SerieFavoritesBloc>()
-                                      .add(LoadSerieFavorites());
+                                      .read<WatchedBloc>()
+                                      .add(LoadWatchedSeries());
                                 },
                                 child: Row(
                                   children: [
@@ -253,14 +253,19 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                                       .read<
                                                           SerieFavoritesBloc>()
                                                       .add(
-                                                          RemoveSerieFromFavorites(
-                                                              series));
+                                                        RemoveSerieFromFavorites(
+                                                          series,
+                                                        ),
+                                                      );
                                                 } else {
                                                   context
                                                       .read<
                                                           SerieFavoritesBloc>()
-                                                      .add(AddSerieToFavorites(
-                                                          series));
+                                                      .add(
+                                                        AddSerieToFavorites(
+                                                          series,
+                                                        ),
+                                                      );
                                                 }
                                               },
                                             );
@@ -310,8 +315,11 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                         BlocBuilder<WatchedBloc, WatchedState>(
                                           builder: (context, watchedState) {
                                             final isInWatchedSeries =
-                                                watchedState is WatchedLoaded &&
-                                                    watchedState.serieIds
+                                                watchedBloc.state
+                                                        is WatchedLoaded &&
+                                                    (watchedBloc.state
+                                                            as WatchedLoaded)
+                                                        .serieIds
                                                         .contains(series.id);
 
                                             return IconButton(
@@ -324,23 +332,97 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                                               tooltip: isInWatchedSeries
                                                   ? 'Remove from watched series.'
                                                   : 'Add to watched series.',
-                                              onPressed: () {
+                                              onPressed: () async {
                                                 if (isInWatchedSeries) {
-                                                  context
-                                                      .read<WatchedBloc>()
-                                                      .add(
+                                                  final result =
+                                                      await di<GetEpisodes>()
+                                                          .call(series.id);
+                                                  result.fold(
+                                                    (failure) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Episodes could not be loaded',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    (episodes) async {
+                                                      final confirm =
+                                                          await showWatchedDialog(
+                                                        context,
+                                                        series.name,
+                                                        'Do you want to mark this serie and its all episodes as unwatched?',
+                                                      );
+                                                      if (confirm != true) {
+                                                        return;
+                                                      }
+
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
                                                         RemoveSeriesFromWatched(
                                                           series,
                                                         ),
                                                       );
+
+                                                      final episodeIds =
+                                                          episodes
+                                                              .map((e) => e.id)
+                                                              .toList();
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
+                                                            RemoveAllEpisodesWatched(
+                                                              series,
+                                                              episodeIds,
+                                                            ),
+                                                          );
+                                                    },
+                                                  );
                                                 } else {
-                                                  context
-                                                      .read<WatchedBloc>()
-                                                      .add(
-                                                        AddSeriesToWatched(
-                                                          series,
+                                                  final result =
+                                                      await di<GetEpisodes>()
+                                                          .call(series.id);
+                                                  result.fold(
+                                                    (failure) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Episodes could not be loaded',
+                                                          ),
                                                         ),
                                                       );
+                                                    },
+                                                    (episodes) async {
+                                                      final confirm =
+                                                          await showWatchedDialog(
+                                                        context,
+                                                        series.name,
+                                                        'Do you want to mark this serie and its all episodes as watched?',
+                                                      );
+                                                      if (confirm != true) {
+                                                        return;
+                                                      }
+
+                                                      final episodeIds =
+                                                          episodes
+                                                              .map((e) => e.id)
+                                                              .toList();
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
+                                                            MarkAllEpisodesWatched(
+                                                              series.id,
+                                                              episodeIds,
+                                                            ),
+                                                          );
+                                                    },
+                                                  );
                                                 }
                                               },
                                             );
@@ -353,11 +435,11 @@ class _SerieFavoritesPageState extends State<SerieFavoritesPage> {
                               );
                             },
                           );
-                        } else if (state is SerieFavoritesError) {
+                        } else if (state is WatchedError) {
                           return Center(child: Text(state.message));
                         }
                         return const Center(
-                          child: Text("Favorite series could not be loaded."),
+                          child: Text("Watched series could not be loaded."),
                         );
                       },
                     ),
