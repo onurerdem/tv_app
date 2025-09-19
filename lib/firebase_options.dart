@@ -53,7 +53,7 @@ class DefaultFirebaseOptions {
 
   static FirebaseOptions android = FirebaseOptions(
     apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
-    appId: '1:95103168259:android:db96b00233de7bf6d44336',
+    appId: '1:95103168259:android:45c4a12bf268b802d44336',
     messagingSenderId: '95103168259',
     projectId: 'tvapp-1caf5',
     storageBucket: 'tvapp-1caf5.firebasestorage.app',

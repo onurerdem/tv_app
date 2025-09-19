@@ -29,8 +29,13 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _startUp() async {
     await Future.delayed(const Duration(seconds: 3));
 
+    if (!context.mounted) return;
+
     final prefs = await SharedPreferences.getInstance();
     final onboarded = prefs.getBool('onboardingCompleted') ?? false;
+
+    if (!context.mounted) return;
+
     if (!onboarded) {
       Navigator.of(context).pushReplacementNamed('/onboard');
       return;
@@ -40,7 +45,9 @@ class _SplashScreenState extends State<SplashScreen>
     if (kDebugMode) {
       print("User: $user");
     }
+    print("Kullanıcı durumu (Release Modu): $user");
     if (user == null) {
+      if (!context.mounted) return;
       Navigator.of(context).pushReplacementNamed('/signIn');
       return;
     }
@@ -51,6 +58,9 @@ class _SplashScreenState extends State<SplashScreen>
         print("idTokenResult: $idTokenResult");
       }
       final exp = idTokenResult.expirationTime;
+
+      if (!context.mounted) return;
+
       if (kDebugMode) {
         print("Exp: $exp");
       }
@@ -77,6 +87,9 @@ class _SplashScreenState extends State<SplashScreen>
       }
       if (exp == null || exp.isBefore(DateTime.now())) {
         await FirebaseAuth.instance.signOut();
+
+        if (!context.mounted) return;
+
         Navigator.of(context).pushReplacementNamed('/signIn');
         return;
       }
@@ -84,10 +97,15 @@ class _SplashScreenState extends State<SplashScreen>
       if (kDebugMode) {
         print("Error: $e");
       }
+      print("YAKALANAN HATA (Release Modu): $e");
+      print("SplashScreen Hata Yakaladı: $e");
       await FirebaseAuth.instance.signOut();
+      if (!context.mounted) return;
       Navigator.of(context).pushReplacementNamed('/signIn');
       return;
     }
+
+    if (!context.mounted) return;
 
     Navigator.of(context).pushReplacementNamed('/main');
 

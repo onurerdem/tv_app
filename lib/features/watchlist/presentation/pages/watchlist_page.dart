@@ -12,6 +12,10 @@ import 'package:tv_app/features/watchlist/presentation/bloc/watchlist_event.dart
 import 'package:tv_app/features/watchlist/presentation/bloc/watchlist_state.dart';
 import 'package:tv_app/injection_container.dart';
 import '../../../series/presentation/pages/serie_details_page.dart';
+import '../../../watched/presentation/bloc/watched_bloc.dart';
+import '../../../watched/presentation/bloc/watched_event.dart';
+import '../../../watched/presentation/bloc/watched_state.dart';
+import '../../../watched/presentation/widgets/show_watched_dialog.dart';
 
 class WatchlistPage extends StatefulWidget {
   const WatchlistPage({super.key});
@@ -29,12 +33,14 @@ class _WatchlistPageState extends State<WatchlistPage> {
     super.initState();
     watchlistBloc = sl<WatchlistBloc>()..add(LoadWatchlist());
     _searchController.addListener(_onSearchChanged);
+    context.read<WatchedBloc>().add(LoadWatchedSeries());
   }
 
   Future<void> _refreshData() async {
     watchlistBloc = sl<WatchlistBloc>()..add(LoadWatchlist());
     _searchController.addListener(_onSearchChanged);
     context.read<WatchlistBloc>().add(LoadWatchlist());
+    context.read<WatchedBloc>().add(LoadWatchedSeries());
     FocusScope.of(context).unfocus();
   }
 
@@ -295,6 +301,117 @@ class _WatchlistPageState extends State<WatchlistPage> {
                                                     AddSerieToWatchlist(
                                                       series,
                                                     ),
+                                                  );
+                                                }
+                                              },
+                                            );
+                                          },
+                                        ),
+                                        BlocBuilder<WatchedBloc, WatchedState>(
+                                          builder: (context, watchedState) {
+                                            final isInWatchedSeries = (watchedState is WatchedLoaded &&
+                                                watchedState.serieIds.contains(series.id));
+
+                                            return IconButton(
+                                              icon: Icon(
+                                                Icons.check_circle,
+                                                color: isInWatchedSeries
+                                                    ? Colors.green
+                                                    : Colors.grey,
+                                              ),
+                                              tooltip: isInWatchedSeries
+                                                  ? 'Remove from watched series.'
+                                                  : 'Add to watched series.',
+                                              onPressed: () async {
+                                                if (isInWatchedSeries) {
+                                                  final result =
+                                                  await di<GetEpisodes>()
+                                                      .call(series.id);
+                                                  result.fold(
+                                                        (failure) {
+                                                      ScaffoldMessenger.of(
+                                                          context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Episodes could not be loaded',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                        (episodes) async {
+                                                      final confirm =
+                                                      await showWatchedDialog(
+                                                        context,
+                                                        series.name,
+                                                        'Do you want to mark this serie and its all episodes as unwatched?',
+                                                      );
+                                                      if (confirm != true) {
+                                                        return;
+                                                      }
+
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
+                                                        RemoveSeriesFromWatched(
+                                                          series,
+                                                        ),
+                                                      );
+
+                                                      final episodeIds =
+                                                      episodes
+                                                          .map((e) => e.id)
+                                                          .toList();
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
+                                                        RemoveAllEpisodesWatched(
+                                                          series,
+                                                          episodeIds,
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
+                                                } else {
+                                                  final result =
+                                                  await di<GetEpisodes>()
+                                                      .call(series.id);
+                                                  result.fold(
+                                                        (failure) {
+                                                      ScaffoldMessenger.of(
+                                                          context)
+                                                          .showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text(
+                                                            'Episodes could not be loaded',
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                        (episodes) async {
+                                                      final confirm =
+                                                      await showWatchedDialog(
+                                                        context,
+                                                        series.name,
+                                                        'Do you want to mark this serie and its all episodes as watched?',
+                                                      );
+                                                      if (confirm != true) {
+                                                        return;
+                                                      }
+
+                                                      final episodeIds =
+                                                      episodes
+                                                          .map((e) => e.id)
+                                                          .toList();
+                                                      context
+                                                          .read<WatchedBloc>()
+                                                          .add(
+                                                        MarkAllEpisodesWatched(
+                                                          series.id,
+                                                          episodeIds,
+                                                        ),
+                                                      );
+                                                    },
                                                   );
                                                 }
                                               },

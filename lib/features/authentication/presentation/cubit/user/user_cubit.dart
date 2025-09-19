@@ -44,6 +44,8 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } on FirebaseAuthException catch (e) {
+      print("HATAYI YAKALADIM (Release Modu) - FirebaseAuthException: ${e.code}");
+
       if (e.code == 'user-not-found' || e.code == 'wrong-password') {
         emit(UserFailure());
         if (kDebugMode) {
@@ -58,12 +60,16 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } on SocketException catch (_) {
+      print("HATAYI YAKALADIM (Release Modu) - SocketException: $_");
+
       emit(UserFailure());
       if (kDebugMode) {
         print(
             "SocketException: $_ **********************************************************");
       }
     } catch (_) {
+      print("HATAYI YAKALADIM (Release Modu) - Genel Hata: $_");
+
       emit(UserFailure());
       if (kDebugMode) {
         print(
