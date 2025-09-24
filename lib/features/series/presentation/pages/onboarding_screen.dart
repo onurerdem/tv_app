@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tv_app/features/authentication/presentation/pages/sign_in_page.dart';
+import 'package:tv_app/features/series/presentation/widgets/show_onboarding_dialog.dart';
 import '../widgets/show_exit_dialog.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -38,7 +39,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     await prefs.setBool('onboardingCompleted', true);
   }
 
-  void _navigateToSeries() {
+  void _navigateToSeries() async {
+    final confirm = await showOnboardingDialog(context);
+    if (confirm != true) {
+      return;
+    }
     _storeOnboardingCompleted();
     Navigator.pushReplacement(
       context,
@@ -97,32 +102,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 itemCount: _onboardingData.length,
                 itemBuilder: (context, index) {
                   final data = _onboardingData[index];
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset(
-                        data["image"]!,
-                        height: 300,
-                        semanticsLabel: data["title"]!,
-                      ),
-                      const SizedBox(height: 20),
-                      Text(
-                        data["title"]!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 30),
-                        child: Text(
-                          data["description"]!,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      ),
-                    ],
+                  return OrientationBuilder(
+                    builder: (context, orientation) {
+                      if (orientation == Orientation.portrait) {
+                        return _buildPortraitLayout(context, data);
+                      } else {
+                        return _buildLandscapeLayout(context, data);
+                      }
+                    },
                   );
                 },
               ),
@@ -144,12 +131,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             (index) => _buildDot(index),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 15),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: _buildNavigationButtons(),
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: MediaQuery.of(context).padding.bottom),
       ],
     );
   }
@@ -231,4 +218,84 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+}
+
+Widget _buildPortraitLayout(BuildContext context, Map<String, String> data) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      SvgPicture.asset(
+        data["image"]!,
+        height: MediaQuery.of(context).size.height / 3.33,
+        semanticsLabel: data["title"]!,
+      ),
+      const SizedBox(height: 20),
+      Text(
+        data["title"]!,
+        style: Theme.of(context)
+            .textTheme
+            .headlineMedium
+            ?.copyWith(fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 10),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Text(
+          data["description"]!,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _buildLandscapeLayout(BuildContext context, Map<String, String> data) {
+  return Padding(
+    padding:
+        const EdgeInsets.only(top: 20.0, bottom: 15.0, left: 20.0, right: 20.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Spacer(
+          flex: 1,
+        ),
+        Expanded(
+          flex: 5,
+          child: SvgPicture.asset(
+            data["image"]!,
+            semanticsLabel: data["title"]!,
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          flex: 5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                data["title"]!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                data["description"]!,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
+        Spacer(
+          flex: 1,
+        ),
+      ],
+    ),
+  );
 }

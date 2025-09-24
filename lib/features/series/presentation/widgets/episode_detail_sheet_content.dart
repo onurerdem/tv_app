@@ -64,33 +64,35 @@ class EpisodeDetailSheetContent extends StatelessWidget {
                     children: [
                       if (episode.imageUrl != null)
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(
-                                width: MediaQuery.of(context).size.width / 20),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(16.0),
-                              child: CachedNetworkImage(
-                                imageUrl: episode.imageUrl!,
-                                width: MediaQuery.of(context).size.width / 1.5,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) => Container(
-                                  width: MediaQuery.of(context).size.width / 2,
-                                  height: 200,
-                                  color: Colors.grey[300],
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
+                              width: MediaQuery.of(context).size.width / 20,
+                            ),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16.0),
+                                child: CachedNetworkImage(
+                                  imageUrl: episode.imageUrl!,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    width: MediaQuery.of(context).size.width / 2,
+                                    height: 200,
+                                    color: Colors.grey[300],
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                errorWidget: (context, url, error) => ClipRRect(
-                                  borderRadius: BorderRadius.circular(16.0),
-                                  child: SvgPicture.asset(
-                                    "assets/images/No-Image-Placeholder.svg",
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
-                                    fit: BoxFit.cover,
+                                  errorWidget: (context, url, error) => ClipRRect(
+                                    borderRadius: BorderRadius.circular(16.0),
+                                    child: SvgPicture.asset(
+                                      "assets/images/No-Image-Placeholder.svg",
+                                      width:
+                                          MediaQuery.of(context).size.width / 2,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -129,15 +131,53 @@ class EpisodeDetailSheetContent extends StatelessWidget {
                           ],
                         )
                       else
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
-                            child: SvgPicture.asset(
-                              "assets/images/No-Image-Placeholder.svg",
-                              width: MediaQuery.of(context).size.width / 2,
-                              fit: BoxFit.cover,
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width / 20,
                             ),
-                          ),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16.0),
+                                child: SvgPicture.asset(
+                                  "assets/images/No-Image-Placeholder.svg",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            BlocSelector<WatchedBloc, WatchedState, bool>(
+                              selector: (watchedState) {
+                                if (watchedState is WatchedLoaded) {
+                                  return watchedState
+                                      .watchedEpisodesMap[episode.id] ??
+                                      false;
+                                }
+                                return false;
+                              },
+                              builder: (context, isWatched) {
+                                return IconButton(
+                                  icon: Icon(
+                                    Icons.check_circle,
+                                    color:
+                                    isWatched ? Colors.green : Colors.grey,
+                                  ),
+                                  tooltip: isWatched
+                                      ? 'Unmark episode as watched'
+                                      : 'Mark episode as watched',
+                                  onPressed: () {
+                                    context.read<WatchedBloc>().add(
+                                      ToggleEpisodeWatched(
+                                        serie.id,
+                                        episode.id,
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       const SizedBox(height: 20),
                       Text(
@@ -188,8 +228,8 @@ class EpisodeDetailSheetContent extends StatelessWidget {
                       Text(
                         episode.summary != null && episode.summary!.isNotEmpty
                             ? episode.summary!
-                            .replaceAll(RegExp(r'<[^>]*>'), '')
-                            .trim()
+                                .replaceAll(RegExp(r'<[^>]*>'), '')
+                                .trim()
                             : "Summary not available.",
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),

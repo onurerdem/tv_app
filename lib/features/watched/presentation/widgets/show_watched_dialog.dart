@@ -6,6 +6,7 @@ Future<bool?> showWatchedDialog(
     context: context,
     barrierDismissible: true,
     builder: (ctx) => AlertDialog(
+      icon: Icon(Icons.warning, color: Colors.red),
       title: Text(
         title,
         style: const TextStyle(

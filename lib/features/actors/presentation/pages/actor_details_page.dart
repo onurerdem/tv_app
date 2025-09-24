@@ -12,6 +12,13 @@ import 'package:tv_app/injection_container.dart';
 import '../../../favoriteActors/presentation/bloc/favorite_actors_bloc.dart';
 import '../../../favoriteActors/presentation/bloc/favorite_actors_event.dart';
 import '../../../favoriteActors/presentation/bloc/favorite_actors_state.dart';
+import '../../../watched/presentation/bloc/watched_bloc.dart';
+import '../../../watched/presentation/bloc/watched_event.dart';
+import '../../../watched/presentation/bloc/watched_state.dart';
+import '../../../watched/presentation/widgets/show_watched_dialog.dart';
+import '../../../watchlist/presentation/bloc/watchlist_bloc.dart';
+import '../../../watchlist/presentation/bloc/watchlist_event.dart';
+import '../../../watchlist/presentation/bloc/watchlist_state.dart';
 import '../../domain/entities/actor.dart';
 import '../bloc/actor_details_bloc.dart';
 import '../bloc/actor_details_event.dart';
@@ -24,6 +31,9 @@ class ActorDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final watchlistBloc = context.read<WatchlistBloc>();
+    final watchedBloc = context.read<WatchedBloc>();
+
     TextSpan boldLabelTextSpan(
       String label,
       String? value,
@@ -339,38 +349,179 @@ class ActorDetailsPage extends StatelessWidget {
                                     ],
                                   ),
                                 ),
-                                BlocBuilder<SerieFavoritesBloc,
-                                    SerieFavoritesState>(
-                                  builder: (context, favState) {
-                                    final isFav = favState
-                                            is SerieFavoritesLoaded &&
-                                        favState.favoriteIds
-                                            .contains(actorCastCredits.serieId);
+                                Column(
+                                  children: [
+                                    BlocBuilder<SerieFavoritesBloc,
+                                        SerieFavoritesState>(
+                                      builder: (context, favState) {
+                                        final isFav = favState
+                                        is SerieFavoritesLoaded &&
+                                            favState.favoriteIds
+                                                .contains(actorCastCredits.serieId);
 
-                                    return IconButton(
-                                      icon: Icon(
-                                        Icons.favorite,
-                                        color: isFav ? Colors.red : Colors.grey,
-                                      ),
-                                      onPressed: () {
-                                        final blocFav =
+                                        return IconButton(
+                                          icon: Icon(
+                                            Icons.favorite,
+                                            color: isFav ? Colors.red : Colors.grey,
+                                          ),
+                                          onPressed: () {
+                                            final blocFav =
                                             context.read<SerieFavoritesBloc>();
-                                        if (isFav) {
-                                          blocFav.add(
-                                            RemoveSerieFromFavorites(
-                                              actorCastCredits.serie,
-                                            ),
-                                          );
-                                        } else {
-                                          blocFav.add(
-                                            AddSerieToFavorites(
-                                              actorCastCredits.serie,
-                                            ),
-                                          );
-                                        }
+                                            if (isFav) {
+                                              blocFav.add(
+                                                RemoveSerieFromFavorites(
+                                                  actorCastCredits.serie,
+                                                ),
+                                              );
+                                            } else {
+                                              blocFav.add(
+                                                AddSerieToFavorites(
+                                                  actorCastCredits.serie,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        );
                                       },
-                                    );
-                                  },
+                                    ),
+                                    BlocBuilder<WatchlistBloc, WatchlistState>(
+                                      builder: (
+                                          context,
+                                          watchlistState,
+                                          ) {
+                                        final isInWatchlist = watchlistBloc.state
+                                        is WatchlistLoaded &&
+                                            (watchlistBloc.state as WatchlistLoaded)
+                                                .serieIds
+                                                .contains(
+                                                actorCastCredits.serie.id);
+
+                                        return IconButton(
+                                          icon: Icon(
+                                            Icons.bookmark,
+                                            color: isInWatchlist
+                                                ? Colors.blue
+                                                : Colors.grey,
+                                          ),
+                                          tooltip: isInWatchlist
+                                              ? 'Remove from watchlist.'
+                                              : 'Add to watchlist.',
+                                          onPressed: () {
+                                            if (isInWatchlist) {
+                                              watchlistBloc.add(
+                                                RemoveSerieFromWatchlist(
+                                                  actorCastCredits.serie,
+                                                ),
+                                              );
+                                            } else {
+                                              watchlistBloc.add(
+                                                AddSerieToWatchlist(
+                                                  actorCastCredits.serie,
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
+                                    BlocBuilder<WatchedBloc, WatchedState>(
+                                      builder: (context, watchedState) {
+                                        final isInWatchedSeries =
+                                            watchedBloc.state is WatchedLoaded &&
+                                                (watchedBloc.state as WatchedLoaded)
+                                                    .serieIds
+                                                    .contains(
+                                                    actorCastCredits.serie.id);
+
+                                        return IconButton(
+                                          icon: Icon(
+                                            Icons.check_circle,
+                                            color: isInWatchedSeries
+                                                ? Colors.green
+                                                : Colors.grey,
+                                          ),
+                                          tooltip: isInWatchedSeries
+                                              ? 'Remove from watched series.'
+                                              : 'Add to watched series.',
+                                          onPressed: () async {
+                                            if (isInWatchedSeries) {
+                                              final result = await di<GetEpisodes>()
+                                                  .call(actorCastCredits.serie.id);
+                                              result.fold(
+                                                    (failure) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Episodes could not be loaded',
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                    (episodes) async {
+                                                  final confirm =
+                                                  await showWatchedDialog(
+                                                    context,
+                                                    actorCastCredits.serie.name,
+                                                    'Do you want to mark this serie and its all episodes as unwatched?',
+                                                  );
+                                                  if (confirm != true) {
+                                                    return;
+                                                  }
+
+                                                  final episodeIds = episodes
+                                                      .map((e) => e.id)
+                                                      .toList();
+                                                  context.read<WatchedBloc>().add(
+                                                    RemoveAllEpisodesWatched(
+                                                      actorCastCredits.serie,
+                                                      episodeIds,
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            } else {
+                                              final result = await di<GetEpisodes>()
+                                                  .call(actorCastCredits.serie.id);
+                                              result.fold(
+                                                    (failure) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                        'Episodes could not be loaded',
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                    (episodes) async {
+                                                  final confirm =
+                                                  await showWatchedDialog(
+                                                    context,
+                                                    actorCastCredits.serie.name,
+                                                    'Do you want to mark this serie and its all episodes as watched?',
+                                                  );
+                                                  if (confirm != true) {
+                                                    return;
+                                                  }
+
+                                                  final episodeIds = episodes
+                                                      .map((e) => e.id)
+                                                      .toList();
+                                                  context.read<WatchedBloc>().add(
+                                                    MarkAllEpisodesWatched(
+                                                      actorCastCredits.serie.id,
+                                                      episodeIds,
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            }
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

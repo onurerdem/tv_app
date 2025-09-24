@@ -7,6 +7,7 @@ Future<void> showExitDialog(context) async {
     barrierDismissible: true,
     builder: (BuildContext context) {
       return AlertDialog(
+        icon: Icon(Icons.warning, color: Colors.red),
         title: const Text(
           'Exit',
           style: TextStyle(
